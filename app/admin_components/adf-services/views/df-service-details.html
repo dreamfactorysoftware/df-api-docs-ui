@@ -1,0 +1,15 @@
+<div>
+    <div class="tab-content" style="margin-top: 20px">
+        <div class="form-group">
+            <div>
+                <button id="services_details_close" type="button" class="btn btn-default" data-ng-click="closeService()">
+                    Back to Service List
+                </button>
+                <button id="services_download_one" type="button" class="btn btn-default" data-ng-click="downloadSelectedServiceDef()">
+                    Download Service Def
+                </button>
+            </div>
+        </div>
+        <df-swagger data-service-name="currentEditService.name" data-is-admin="isAdmin"></df-swagger>
+    </div>
+</div>

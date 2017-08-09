@@ -1,0 +1,84 @@
+<!doctype html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <title>DreamFactory</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+
+      <!-- CDN -->
+      <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+
+      <!-- build:css({.tmp,app}) styles/styles.css -->
+      <link rel="stylesheet" href="styles/stylesheets/styles.css" />
+      <link rel="stylesheet" href="../bower_components/pnotify/pnotify.core.css" />
+      <link rel="stylesheet" href="../bower_components/pnotify/pnotify.buttons.css" />
+      <!-- endbuild -->
+
+  </head>
+  <body ng-app="dreamfactoryApidocsApp">
+
+    <!--[if lt IE 7]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <!-- Add your site or application content here -->
+    <div id="dreamfactoryApidocsApp" data-ng-controller="MainCtrl">
+        <!-- Rendering Context -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="row">
+                        <div data-ng-view=""></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- build:js(.) scripts/oldieshim.js -->
+    <!--[if lt IE 9]>
+    <script src="../bower_components/es5-shim/es5-shim.js"></script>
+    <script src="../bower_components/json3/lib/json3.min.js"></script>
+    <![endif]-->
+    <!-- endbuild -->
+
+    <!-- build:js(.) scripts/vendor.js -->
+        <!-- bower:js -->
+        <script src="../bower_components/jquery/dist/jquery.js"></script>
+        <script src="../bower_components/es5-shim/es5-shim.js"></script>
+        <script src="../bower_components/angular/angular.js"></script>
+        <script src="../bower_components/json3/lib/json3.js"></script>
+        <script src="../bower_components/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="../bower_components/angular-resource/angular-resource.js"></script>
+        <script src="../bower_components/angular-cookies/angular-cookies.js"></script>
+        <script src="../bower_components/angular-sanitize/angular-sanitize.js"></script>
+        <script src="../bower_components/angular-animate/angular-animate.js"></script>
+        <script src="../bower_components/angular-touch/angular-touch.js"></script>
+        <script src="../bower_components/angular-route/angular-route.js"></script>
+        <script src="../bower_components/pnotify/pnotify.core.js"></script>
+        <script src="../bower_components/pnotify/pnotify.buttons.js"></script>
+        <script src="../bower_components/pnotify/pnotify.callbacks.js"></script>
+        <script src="../bower_components/pnotify/pnotify.confirm.js"></script>
+        <script src="../bower_components/pnotify/pnotify.desktop.js"></script>
+        <script src="../bower_components/pnotify/pnotify.history.js"></script>
+        <script src="../bower_components/pnotify/pnotify.nonblock.js"></script>
+        <!-- endbower -->
+    <!-- endbuild -->
+
+    <!-- build:js({.tmp,app}) scripts/app.js -->
+    <script src="admin_components/adf-utility/dreamfactory-utility.js"></script>
+    <script src="admin_components/adf-table/dreamfactory-table.js"></script>
+    <script src="admin_components/adf-services/dreamfactory-services.js"></script>
+    <script src="admin_components/adf-swagger-ui/dreamfactory-swagger-ui.js"></script>
+    <script src="scripts/app.js"></script>
+    <script src="scripts/controllers/main.js"></script>
+    <script src="scripts/polyfill.js"></script>
+    <!-- endbuild -->
+
+  </body>
+</html>

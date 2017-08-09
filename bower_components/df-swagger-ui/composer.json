@@ -1,0 +1,35 @@
+{
+    "name":              "dreamfactory/df-swagger-ui",
+    "type":              "dreamfactory-app",
+    "description":       "DreamFactory(tm) Swagger UI",
+    "homepage":          "https://github.com/dreamfactorysoftware/df-swagger-ui/",
+    "keywords":          [
+        "rest",
+        "api",
+        "swagger",
+        "dreamfactory"
+    ],
+    "license":           ["Apache-2.0"],
+    "authors":           [
+        {
+            "name":  "DreamFactory Software, Inc.",
+            "email": "support@dreamfactory.com",
+            "role":  "Developer"
+        }
+    ],
+    "support":           {
+        "source": "https://github.com/dreamfactorysoftware/df-swagger-ui",
+        "issues": "https://github.com/dreamfactorysoftware/df-swagger-ui/issues",
+        "email":  "support@dreamfactory.com",
+        "wiki":   "https://wiki.dreamfactory.com"
+    },
+    "require":           {
+        "dreamfactory/installer": "*"
+    },
+    "extra":             {
+        "branch-alias":   {
+            "dev-develop": "0.2.x-dev"
+        },
+        "installer-name": "df-swagger-ui"
+    }
+}

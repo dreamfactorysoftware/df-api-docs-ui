@@ -1,0 +1,35 @@
+{
+  "name": "df-swagger-ui",
+  "main": "dist/index.html",
+  "authors": [
+    "Mohsen Azimi <me@azimi.me>"
+  ],
+  "description": "Swagger UI for DreamFactory",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "Swagger",
+    "API"
+  ],
+  "license": "Copyright 2016 SmartBear Software",
+  "homepage": "http://swagger.io",
+  "private": false,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "version": "0.3.0",
+  "_release": "0.3.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "0.3.0",
+    "commit": "a6dd0970439652d04dfea89913e5766c69217979"
+  },
+  "_source": "https://github.com/dreamfactorysoftware/df-swagger-ui.git",
+  "_target": "0.3.0",
+  "_originalSource": "df-swagger-ui"
+}
