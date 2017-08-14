@@ -288,6 +288,10 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                         scope._forgotPassword();
                     };
 
+                    scope.skipLogin = function () {
+                        scope._skipLogin();
+                    };
+
                     scope.showLoginForm = function () {
                         scope._toggleForms();
                     };
@@ -407,7 +411,12 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
 
                         scope.$broadcast(UserEventsService.password.passwordResetRequest, {email: scope.creds.email});
 
-                    }
+                    };
+
+                    scope._skipLogin = function () {
+
+                        $location.url('/services');
+                    };
 
                     // WATCHERS AND INIT
                     // We define any watchers or init code that needs to be run here.

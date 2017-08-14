@@ -31,8 +31,12 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
         // Set empty search result message
         var details = "";
         var user = UserDataService.getCurrentUser();
-        if (user && !user.is_sys_admin) {
-            details = 'Your role must allow access to a service for it to appear in this list.';
+        if (!user) {
+            details = 'You are not logged in. The default role for the API Docs app will determine which active services you have access to.';
+        } else if (!user.is_sys_admin) {
+            details = 'You are logged in as a non-admin user. Your assigned role for the API Docs app will determine which active services you have access to.';
+        } else {
+            details = "You are logged in as an admin user which allows access to all active services.";
         }
         $scope.emptySearchResult = {
             title: 'There are no active services that match your search criteria!',
