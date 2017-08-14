@@ -18,7 +18,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
 
     }])
 
-    .controller('ServicesCtrl', ['$rootScope', '$scope', '$location', 'dfApiDataService', 'dfNotify', function ($rootScope, $scope, $location, dfApiDataService, dfNotify) {
+    .controller('ServicesCtrl', ['$rootScope', '$scope', '$location', 'dfApiDataService', 'UserDataService', 'dfNotify', function ($rootScope, $scope, $location, dfApiDataService, UserDataService, dfNotify) {
 
         $scope.adminApp = dfApiDataService.getQueryParameter("admin_app");
         $scope.apiData = null;
@@ -29,9 +29,14 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
         $scope.searchText = {"value": null};
 
         // Set empty search result message
+        var details = "";
+        var user = UserDataService.getCurrentUser();
+        if (user && !user.is_sys_admin) {
+            details = 'Your role must allow access to a service for it to appear in this list.';
+        }
         $scope.emptySearchResult = {
             title: 'There are no active services that match your search criteria!',
-            text: $scope.adminApp ? "" : 'If you are not an admin user your role must allow access to the service for it to appear in this list.'
+            text: details
         };
 
         $scope.saveAsFile = function (data, filename) {

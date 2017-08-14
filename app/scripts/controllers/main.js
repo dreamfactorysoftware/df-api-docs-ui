@@ -94,11 +94,11 @@ angular.module('dreamfactoryApidocsApp')
                 var links = [];
 
                 if (!newValue) {
-                    $location.url('/login');
                     links.push("login");
+                    $location.url('/login');
                 } else {
-                    $location.url("/services");
                     links.push("user");
+                    $location.url("/services");
                     $scope.setTopLevelLinkValue('user', 'label', newValue.name);
                 }
                 $scope._setActiveLinks($scope.topLevelLinks, links);

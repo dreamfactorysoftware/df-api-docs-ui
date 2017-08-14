@@ -10,37 +10,29 @@
                 <div class = "container-fluid">
                 <div class = "row">
                     <div class="col-xs-3">
-                        <div class="form-group">
-                            <label for="" class="input-sm">Service Group</label>
-                            <select class="form-control input-sm" data-ng-model="selectedGroup.name" data-ng-options="name as name for (name, value) in serviceGroups" data-ng-disabled="apiData === null">
-                                <option value="">All</option>
-                            </select>
-                        </div>
+                        <label for="" class="input-sm">Service Group</label>
+                        <select class="form-control input-sm" data-ng-model="selectedGroup.name" data-ng-options="name as name for (name, value) in serviceGroups" data-ng-disabled="apiData === null">
+                            <option value="">All</option>
+                        </select>
                     </div>
                     <div class="col-xs-3">
-                        <div class="form-group">
-                            <label for="" class="input-sm">Service Type</label>
-                            <select class="form-control input-sm" data-ng-model="selectedType.name" data-ng-options="type.name as type.label for type in serviceGroups[selectedGroup.name]" data-ng-disabled="apiData === null">
-                                <option value="">All</option>
-                            </select>
-                        </div>
+                        <label for="" class="input-sm">Service Type</label>
+                        <select class="form-control input-sm" data-ng-model="selectedType.name" data-ng-options="type.name as type.label for type in serviceGroups[selectedGroup.name]" data-ng-disabled="apiData === null">
+                            <option value="">All</option>
+                        </select>
                     </div>
                     <div class="col-xs-3">
-                        <div class="form-group">
-                            <label for="" class="input-sm">&nbsp;</label>
-                            <input type="text" data-ng-model="searchText.value" class="form-control input-sm" placeholder="Search name, label, description">
-                        </div>
+                        <label for="" class="input-sm">&nbsp;</label>
+                        <input type="text" data-ng-model="searchText.value" class="form-control input-sm" placeholder="Search name, label, description">
                     </div>
                     <div class="col-xs-3">
-                        <div class="form-group">
+                        <div>
                             <div>
-                                <div>
-                                    <label for="" class="input-sm">&nbsp;</label>
-                                </div>
-                                <a class="btn btn-small btn-primary" data-ng-click="downloadAllServiceDef()">
-                                    <i class="fa fa-download"></i> Download Full System Doc
-                                </a>
+                                <label for="" class="input-sm">&nbsp;</label>
                             </div>
+                            <a class="btn btn-small btn-primary" data-ng-click="downloadAllServiceDef()">
+                                <i class="fa fa-download"></i> Download Full System Doc
+                            </a>
                         </div>
                     </div>
                 </div>
