@@ -38,34 +38,24 @@ angular.module('dfSwaggerUI', ['ngRoute', 'dfUtility'])
 
     }])
 
-    .directive('dfSwagger', ['MOD_SWAGGER_UI_ASSET_PATH', '$location', 'APP_API_KEY', '$cookies', function(MOD_SWAGGER_UI_ASSET_PATH, $location, APP_API_KEY, $cookies) {
+    .directive('dfSwagger', ['MOD_SWAGGER_UI_ASSET_PATH', 'INSTANCE_URL', 'APP_API_KEY', 'UserDataService', function(MOD_SWAGGER_UI_ASSET_PATH, INSTANCE_URL, APP_API_KEY, UserDataService) {
 
         return {
             restrict: 'E',
             scope: {
-                serviceName: "=",
-                isAdmin: "="
+                serviceName: "="
             },
             templateUrl: MOD_SWAGGER_UI_ASSET_PATH + 'views/swagger.html',
             link: function( scope, elem, attrs ) {
 
-                var port;
+                var url = INSTANCE_URL + "/api/v2/api_docs/" + scope.serviceName;
 
-                scope.server = $location.protocol() + '://' + $location.host();
-
-                port = $location.port();
-                if (port) {
-                    scope.server += ':' + port;
-                }
-
-                var url = scope.server + "/api/v2/api_docs/_service/" + scope.serviceName;
-
-                scope.server += '/df-api-docs-ui/bower_components/df-swagger-ui/dist/index.html';
+                scope.server = INSTANCE_URL + '/df-api-docs-ui/bower_components/df-swagger-ui/dist/index.html';
 
                 scope.server +=
                     "?api_key=" + encodeURIComponent(APP_API_KEY) +
                     "&url=" + encodeURIComponent(url) +
-                    "&session_token=" + encodeURIComponent($cookies.get("PHPSESSID"));
+                    "&session_token=" + encodeURIComponent(UserDataService.getCurrentUser().session_token);
             }
         };
     }])

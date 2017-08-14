@@ -26,7 +26,13 @@
     <![endif]-->
 
     <!-- Add your site or application content here -->
-    <div id="dreamfactoryApidocsApp" data-ng-controller="MainCtrl">
+    <div id="dreamfactoryApidocsApp" data-ng-controller="MainCtrl" df-popup-login>
+
+        <div id="popup-login-container"></div>
+
+        <!-- Top level Nav -->
+        <df-top-level-nav-std ng-if="!adminApp" data-options="topLevelNavOptions"></df-top-level-nav-std>
+
         <!-- Rendering Context -->
         <div class="container-fluid">
             <div class="row">
@@ -75,6 +81,8 @@
     <script src="admin_components/adf-table/dreamfactory-table.js"></script>
     <script src="admin_components/adf-services/dreamfactory-services.js"></script>
     <script src="admin_components/adf-swagger-ui/dreamfactory-swagger-ui.js"></script>
+    <script src="admin_components/adf-user-management/dreamfactory-user-management.js"></script>
+    <script src="admin_components/adf-system-config/dreamfactory-system-config.js"></script>
     <script src="scripts/app.js"></script>
     <script src="scripts/controllers/main.js"></script>
     <script src="scripts/polyfill.js"></script>
