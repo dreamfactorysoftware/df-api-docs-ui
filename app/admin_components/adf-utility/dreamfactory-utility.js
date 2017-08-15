@@ -535,6 +535,11 @@ angular.module('dfUtility', [])
             confirm: function (msg) {
 
                 return confirm(msg);
+            },
+
+            clear: function() {
+
+                PNotify.removeAll();
             }
         };
     }])

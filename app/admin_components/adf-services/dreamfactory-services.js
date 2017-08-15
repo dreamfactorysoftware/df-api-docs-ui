@@ -171,7 +171,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
         }();
     }])
 
-    .directive('dfManageServices', ['$rootScope', 'MOD_SERVICES_ASSET_PATH', 'dfApiDataService', function ($rootScope, MOD_SERVICES_ASSET_PATH, dfApiDataService) {
+    .directive('dfManageServices', ['$rootScope', 'MOD_SERVICES_ASSET_PATH', 'dfApiDataService', 'dfNotify', function ($rootScope, MOD_SERVICES_ASSET_PATH, dfApiDataService, dfNotify) {
 
         return {
             restrict: 'E',
@@ -229,16 +229,31 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
                 scope.editService = function (service) {
 
                     // make sure we have a valid session before passing control to swagger
+                    // also checks for services with no paths defined in service definition
                     var apis = [
 
                         {
-                            "path": ""
+                            "path": "api_docs/" + service.name
                         }
                     ];
 
                     dfApiDataService.getApiData(apis).then(
                         function (response) {
-                            scope.currentEditService = service;
+                            if (Array.isArray(response) &&
+                                Array.isArray(response[0].paths) &&
+                                response[0].paths.length === 0) {
+                                var messageOptions = {
+                                    module: 'Api Error',
+                                    type: 'error',
+                                    provider: 'dreamfactory',
+                                    message: "The service '" + service.name + "' has no API docs."
+                                };
+                                dfNotify.error(messageOptions);
+                            }
+                            else {
+                                dfNotify.clear();
+                                scope.currentEditService = service;
+                            }
                         },
                         function (error) {
                             var messageOptions = {
