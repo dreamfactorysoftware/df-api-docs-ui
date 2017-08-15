@@ -22,14 +22,14 @@
     "test",
     "tests"
   ],
-  "version": "0.3.0",
-  "_release": "0.3.0",
+  "version": "0.3.1",
+  "_release": "0.3.1",
   "_resolution": {
     "type": "version",
-    "tag": "0.3.0",
-    "commit": "a6dd0970439652d04dfea89913e5766c69217979"
+    "tag": "0.3.1",
+    "commit": "ecfce151a6d14fe42fc5d70c1ec53fc8e838596d"
   },
   "_source": "https://github.com/dreamfactorysoftware/df-swagger-ui.git",
-  "_target": "0.3.0",
+  "_target": "0.3.1",
   "_originalSource": "df-swagger-ui"
 }

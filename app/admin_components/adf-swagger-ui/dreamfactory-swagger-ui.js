@@ -54,8 +54,14 @@ angular.module('dfSwaggerUI', ['ngRoute', 'dfUtility'])
 
                 scope.server +=
                     "?api_key=" + encodeURIComponent(APP_API_KEY) +
-                    "&url=" + encodeURIComponent(url) +
-                    "&session_token=" + encodeURIComponent(UserDataService.getCurrentUser().session_token);
+                    "&url=" + encodeURIComponent(url);
+
+                var user = UserDataService.getCurrentUser();
+
+                if (user && user.session_token) {
+                    scope.server +=
+                        "&session_token=" + encodeURIComponent(user.session_token);
+                }
             }
         };
     }])
