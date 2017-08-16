@@ -26,10 +26,14 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
             name = name.replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
 
             var regex = new RegExp('(?:^|;)\\s?' + name + '=(.*?)(?:;|$)','i'),
-                match = window.parent.document.cookie.match(regex);
+                match = null;
 
-            if ((match === null) && window.opener) {
+            if (window.opener) {
                 match = window.opener.document.cookie.match(regex);
+            }
+
+            if (match === null) {
+                match = window.parent.document.cookie.match(regex);
             }
 
             return match && decodeURIComponent(match[1]);
