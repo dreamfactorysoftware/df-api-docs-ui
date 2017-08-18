@@ -365,19 +365,13 @@ angular.module('dfUtility', [])
     }
     ])
 
-    .service('dfApiDataService', ['$q', '$http', '$location', '$cookies', function ($q, $http, $location, $cookies) {
+    .service('dfApiDataService', ['$q', '$http', 'INSTANCE_URL', function ($q, $http, INSTANCE_URL) {
 
         function loadOne(api) {
 
             var deferred = $q.defer();
 
-            var url = $location.protocol() + '://' + $location.host();
-
-            if ($location.port()) {
-                url += ':' + $location.port();
-            }
-
-            url += "/api/v2/" + api.path;
+            var url = INSTANCE_URL + "/api/v2/" + api.path;
 
             $http.get(url).then(
                 function (result) {
@@ -422,35 +416,6 @@ angular.module('dfUtility', [])
                 return '';
             }
         }
-    }])
-
-    .run(['$cookies', '$http', function ($cookies, $http) {
-
-        var getSessionTokenCookie = function () {
-
-            var phpSessionId = window.parent.document.cookie.match(/PHPSESSID=[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\;/i);
-
-            if (phpSessionId == null)
-                return '';
-
-            if (typeof(phpSessionId) == 'undefined')
-                return '';
-
-            if (phpSessionId.length <= 0)
-                return '';
-
-            phpSessionId = phpSessionId[0];
-
-            var end = phpSessionId.lastIndexOf(';');
-            if (end == -1) end = phpSessionId.length;
-
-            return phpSessionId.substring(10, end);
-        };
-
-        // inherit browser cookie value
-        var sessionToken = getSessionTokenCookie();
-        $cookies.put('PHPSESSID', sessionToken);
-        $http.defaults.headers.common['X-DreamFactory-Session-Token'] = sessionToken;
     }])
 
     .directive('dfEmptySearchResult', ['MOD_UTILITY_ASSET_PATH', '$location', function (MOD_UTILITY_ASSET_PATH, $location) {
@@ -570,6 +535,84 @@ angular.module('dfUtility', [])
             confirm: function (msg) {
 
                 return confirm(msg);
+            },
+
+            clear: function() {
+
+                PNotify.removeAll();
             }
-        }
+        };
+    }])
+
+    // Pop up login screen for session time outs
+    .directive('dfPopupLogin', ['MOD_UTILITY_ASSET_PATH', '$compile', '$location', 'UserEventsService', function (MOD_UTILITY_ASSET_PATH, $compile, $location, UserEventsService) {
+
+        return {
+            restrict: 'A',
+            scope: false,
+            link: function (scope, elem, attrs) {
+
+                scope.popupLoginOptions = {
+                    showTemplate: true
+                };
+
+                scope.openLoginWindow = function (errormsg) {
+
+                    var html = '<div id="df-login-frame" style="overflow: hidden; position: absolute; top:0; z-index:99999; background: rgba(0, 0, 0, .8); width: 100%; height: 100%"><div style="padding-top: 120px;"><dreamfactory-user-login data-in-err-msg="errormsg.data.error.message" data-options="popupLoginOptions"></dreamfactory-user-login></div></div>';
+                    $('#popup-login-container').html($compile(html)(scope));
+                };
+
+                scope.$on(UserEventsService.login.loginSuccess, function(e, userDataObj) {
+
+                    e.stopPropagation();
+                    $('#df-login-frame').remove();
+                });
+
+                scope.$on(UserEventsService.login.loginError, function(e, userDataObj) {
+
+                    $('#df-login-frame').remove();
+                    $location.url('/logout');
+                });
+            }
+        };
+    }])
+
+    // declare our directive and pass in our constant
+    .directive('dfTopLevelNavStd', ['MOD_UTILITY_ASSET_PATH', function (MOD_UTILITY_ASSET_PATH) {
+
+        return {
+
+            // Only allow this directive to be used as an element
+            restrict: 'E',
+
+            // Use an isolate scope
+            scope: {
+
+                // pass in our links.  This will be an array of link objects
+                options: '=?'
+            },
+
+            // tell the directive where our template is
+            templateUrl: MOD_UTILITY_ASSET_PATH + 'views/df-top-level-nav-std.html',
+
+            // link it all together.  We'll be putting some business logic in here to
+            // handle updating the active link
+            link: function (scope, elem, attrs) {
+
+                scope.links = scope.options.links;
+                scope.activeLink = null;
+            }
+        };
+    }])
+
+    // Icon Service
+    .service('dfIconService', [function () {
+
+        return function () {
+
+            return {
+                login: 'fa fa-fw fa-sign-in',
+                user: 'fa fa-fw fa-user'
+            };
+        };
     }])

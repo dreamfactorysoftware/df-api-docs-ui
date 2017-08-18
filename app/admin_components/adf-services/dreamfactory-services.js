@@ -18,9 +18,9 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
 
     }])
 
-    .controller('ServicesCtrl', ['$rootScope', '$scope', '$location', 'dfApiDataService', 'dfNotify', function ($rootScope, $scope, $location, dfApiDataService, dfNotify) {
+    .controller('ServicesCtrl', ['$rootScope', '$scope', '$location', 'dfApiDataService', 'UserDataService', 'dfNotify', function ($rootScope, $scope, $location, dfApiDataService, UserDataService, dfNotify) {
 
-        $scope.isAdmin = dfApiDataService.getQueryParameter("admin_app");
+        $scope.adminApp = dfApiDataService.getQueryParameter("admin_app");
         $scope.apiData = null;
         $scope.services = null;
         $scope.filteredServices = null;
@@ -29,9 +29,18 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
         $scope.searchText = {"value": null};
 
         // Set empty search result message
+        var details = "";
+        var user = UserDataService.getCurrentUser();
+        if (!user) {
+            details = 'You are not logged in. The default role for the API Docs app will determine which active services you have access to.';
+        } else if (!user.is_sys_admin) {
+            details = 'You are logged in as a non-admin user. Your assigned role for the API Docs app will determine which active services you have access to.';
+        } else {
+            details = "You are logged in as an admin user which allows access to all active services.";
+        }
         $scope.emptySearchResult = {
             title: 'There are no active services that match your search criteria!',
-            text: $scope.isAdmin ? "" : 'If you are not an admin user your role must allow access to the service for it to appear in this list.'
+            text: details
         };
 
         $scope.saveAsFile = function (data, filename) {
@@ -104,7 +113,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
             var apis = [
 
                 {
-                    "path": "api_docs/_service/" + $scope.currentEditService.name
+                    "path": "api_docs/" + $scope.currentEditService.name
                 }
             ];
 
@@ -133,12 +142,8 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
             var apis = [
 
                 {
-                    "name": "service_type",
-                    "path": "api_docs/_service_type"
-                },
-                {
-                    "name": "service",
-                    "path": "api_docs/_service"
+                    "name": "service_info",
+                    "path": ""
                 }
             ];
 
@@ -166,7 +171,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
         }();
     }])
 
-    .directive('dfManageServices', ['$rootScope', 'MOD_SERVICES_ASSET_PATH', function ($rootScope, MOD_SERVICES_ASSET_PATH) {
+    .directive('dfManageServices', ['$rootScope', 'MOD_SERVICES_ASSET_PATH', 'dfApiDataService', 'dfNotify', function ($rootScope, MOD_SERVICES_ASSET_PATH, dfApiDataService, dfNotify) {
 
         return {
             restrict: 'E',
@@ -222,7 +227,44 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
                 };
 
                 scope.editService = function (service) {
-                    scope.currentEditService = service;
+
+                    // make sure we have a valid session before passing control to swagger
+                    // also checks for services with no paths defined in service definition
+                    var apis = [
+
+                        {
+                            "path": "api_docs/" + service.name
+                        }
+                    ];
+
+                    dfApiDataService.getApiData(apis).then(
+                        function (response) {
+                            if (Array.isArray(response) &&
+                                Array.isArray(response[0].paths) &&
+                                response[0].paths.length === 0) {
+                                var messageOptions = {
+                                    module: 'Api Error',
+                                    type: 'error',
+                                    provider: 'dreamfactory',
+                                    message: "The service '" + service.name + "' has no API docs."
+                                };
+                                dfNotify.error(messageOptions);
+                            }
+                            else {
+                                dfNotify.clear();
+                                scope.currentEditService = service;
+                            }
+                        },
+                        function (error) {
+                            var messageOptions = {
+                                module: 'Api Error',
+                                type: 'error',
+                                provider: 'dreamfactory',
+                                message: {"data": error}
+                            };
+                            dfNotify.error(messageOptions);
+                        }
+                    );
                 };
 
                 scope.orderOnSelect = function (fieldObj) {
@@ -245,8 +287,10 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
 
                         var services = [];
 
-                        angular.forEach(scope.apiData['service'], function (service) {
-                            services.push(new ManagedService(service));
+                        angular.forEach(scope.apiData.service_info.services, function (service) {
+                            if (service.name !== 'api_docs') {
+                                services.push(new ManagedService(service));
+                            }
                         });
 
                         scope.services = services;
@@ -256,12 +300,14 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
 
                         var group, groups = {};
 
-                        angular.forEach(scope.apiData['service_type'], function (service) {
+                        angular.forEach(scope.apiData.service_info.service_types, function (service) {
                             group = service.group;
-                            if (!groups.hasOwnProperty(group)) {
-                                groups[group] = [];
+                            if (group !== 'API Doc' ) {
+                                if (!groups.hasOwnProperty(group)) {
+                                    groups[group] = [];
+                                }
+                                groups[group].push({"name": service.name, "label": service.label})
                             }
-                            groups[group].push({"name": service.name, "label": service.label})
                         });
 
                         scope.serviceGroups = groups;
