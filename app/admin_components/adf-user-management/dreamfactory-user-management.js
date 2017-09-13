@@ -36,7 +36,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                 match = window.parent.document.cookie.match(regex);
             }
 
-            return match && decodeURIComponent(match[1]);
+            return match && unescape(match[1]);
         };
 
         // inherit admin app cookie value
