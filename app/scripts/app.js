@@ -20,7 +20,7 @@ angular
     ])
 
     // Set application version number
-    .constant('APP_VERSION', '1.0.0')
+    .constant('APP_VERSION', '1.0.1')
 
     // Set API key for this application, also used by df-swagger-ui
     .constant('APP_API_KEY', '36fda24fe5588fa4285ac6c6c2fdfbdb6b6bc9834699774c9bf777f706d05a88')
