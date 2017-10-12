@@ -37,37 +37,29 @@ angular
     // Configure main app routing rules
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider
-            .when('/login', {
-                controller: 'LoginCtrl',
-                templateUrl: 'views/login.html',
-                resolve: {
-
-                    checkLoginRoute: ['UserDataService', '$location', function (UserDataService, $location) {
-
-                        var currentUser = UserDataService.getCurrentUser();
-
-                        if (currentUser && currentUser.session_token) {
-                            $location.url('/services');
-                        }
-                    }]
-                }
-            })
             .when('/logout', {
-                templateUrl: 'views/logout.html',
-                controller: 'LogoutCtrl'
+                controller: 'LogoutCtrl',
+                templateUrl: 'views/logout.html'
             })
             .otherwise({
                 controller: 'LoginCtrl',
                 templateUrl: 'views/login.html',
                 resolve: {
 
-                    checkLoginRoute: ['UserDataService', '$location', function (UserDataService, $location) {
+                    checkLoginRoute: ['$q', 'UserDataService', '$location', function ($q, UserDataService, $location) {
 
+                        var deferred = $q.defer();
                         var currentUser = UserDataService.getCurrentUser();
 
-                        if (currentUser && currentUser.session_token) {
+                        // we're trying to go to login
+                        // if we have a valid session then no need to go to login
+                        if (currentUser && currentUser.session_id) {
                             $location.url('/services');
+                            deferred.reject();
+                        } else {
+                            deferred.resolve();
                         }
+                        return deferred.promise;
                     }]
                 }
             });
@@ -76,7 +68,7 @@ angular
     // Intercepts outgoing http calls.  Checks for valid session.  If 401 will trigger a pop up login screen.
     .factory('httpValidSession', ['$q', '$rootScope', '$location', 'INSTANCE_URL', '$injector', function ($q, $rootScope, $location, INSTANCE_URL, $injector) {
 
-        var putSession = function (reject) {
+        var refreshSession = function (reject) {
 
             var $http = $injector.get('$http');
             var UserDataService = $injector.get('UserDataService');
@@ -92,7 +84,7 @@ angular
                 UserDataService.setCurrentUser(result.data);
                 retry(reject.config, deferred);
             }, function () {
-                refreshSession(reject, deferred)
+                newSession(reject, deferred);
             });
 
             return deferred.promise;
@@ -118,7 +110,7 @@ angular
             return deferred.promise;
         };
 
-        var refreshSession = function (reject, deferred) {
+        var newSession = function (reject, deferred) {
 
             var UserDataService = $injector.get('UserDataService');
             UserDataService.unsetCurrentUser();
@@ -152,17 +144,18 @@ angular
 
             responseError: function (reject) {
 
-                if (reject.status === 400 || reject.data.error.code === 400 ||
-                    reject.status === 401 || reject.data.error.code === 401 ||
-                    reject.status === 403 || reject.data.error.code === 403) {
-                    if (reject.config.url.indexOf('/session') === -1) {
+                if (reject.config.url.indexOf('/session') === -1) {
+                    if (reject.status === 400 || (reject.data && reject.data.error && reject.data.error.code === 400) ||
+                        reject.status === 401 || (reject.data && reject.data.error && reject.data.error.code === 401) ||
+                        ((reject.status === 403 || (reject.data && reject.data.error && reject.data.error.code === 403)) && reject.data.error.message.indexOf('The token has been blacklisted') >= 0)) {
+
                         if (reject.data.error.message === 'Token has expired') {
-                            //  put session
-                            return putSession(reject);
+                            //  refresh session
+                            return refreshSession(reject);
                         }
                         else {
-                            // refresh session
-                            return refreshSession(reject);
+                            // new session
+                            return newSession(reject);
                         }
                     }
                 }

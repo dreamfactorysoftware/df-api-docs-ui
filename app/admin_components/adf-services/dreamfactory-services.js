@@ -368,7 +368,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
                     }
                 });
             }
-        }
+        };
     }])
 
     .directive('dfServiceDetails', ['MOD_SERVICES_ASSET_PATH', function (MOD_SERVICES_ASSET_PATH) {
@@ -385,7 +385,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
                     scope.$parent.currentEditService = null;
                 };
             }
-        }
+        };
     }])
 
     .directive('dfApiDocsLoading', [function() {

@@ -195,4 +195,4 @@ angular.module('dreamfactoryApidocsApp')
             // redirect
             $location.url('/login');
         });
-    }])
+    }]);
