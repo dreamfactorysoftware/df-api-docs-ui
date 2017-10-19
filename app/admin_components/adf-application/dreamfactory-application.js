@@ -35,7 +35,7 @@ angular.module('dfApplication', ['dfUtility', 'dfUserManagement', 'ngResource'])
         function _loadOne(api, forceRefresh) {
 
             var params, options;
-            var debugLevel = 1;
+            var debugLevel = 0;
             var deferred = $q.defer();
 
             if (forceRefresh !== true && dfApplicationObj.apis.hasOwnProperty(api)) {
@@ -66,7 +66,7 @@ angular.module('dfApplication', ['dfUtility', 'dfUserManagement', 'ngResource'])
 
         function _getApiDataSync(api, forceRefresh) {
 
-            var debugLevel = 1;
+            var debugLevel = 0;
 
             if (forceRefresh !== true && dfApplicationObj.apis.hasOwnProperty(api)) {
                 if (debugLevel >= 1) console.log('_getApiDataSync(' + api + '): from cache', dfApplicationObj.apis[api]);
