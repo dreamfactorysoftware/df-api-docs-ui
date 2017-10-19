@@ -10,12 +10,12 @@
 angular.module('dreamfactoryApidocsApp')
 
     // MainCtrl is the parent controller of everything.
-    .controller('MainCtrl', ['$scope', 'dfApiDataService', '$location', 'UserDataService', 'dfIconService',
-        function ($scope, dfApiDataService, $location, UserDataService, dfIconService) {
+    .controller('MainCtrl', ['$scope', 'dfApplicationData', '$location', 'UserDataService', 'dfIconService',
+        function ($scope, dfApplicationData, $location, UserDataService, dfIconService) {
 
             $scope.title = 'DreamFactory API Docs';
 
-            $scope.adminApp = dfApiDataService.getQueryParameter("admin_app");
+            $scope.adminApp = dfApplicationData.getQueryParameter("admin_app");
 
             $scope.currentUser = UserDataService.getCurrentUser();
 
@@ -93,12 +93,15 @@ angular.module('dreamfactoryApidocsApp')
 
                 var links = [];
 
+                if (!angular.equals(newValue, oldValue)) {
+                    // user changed, reset application object to force reload of all data
+                    dfApplicationData.resetApplicationObj();
+                }
+
                 if (!newValue) {
                     links.push("login");
-                    $location.url('/login');
                 } else {
                     links.push("user");
-                    $location.url("/services");
                     $scope.setTopLevelLinkValue('user', 'label', newValue.name);
                 }
                 $scope._setActiveLinks($scope.topLevelLinks, links);

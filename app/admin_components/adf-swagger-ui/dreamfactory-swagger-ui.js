@@ -64,7 +64,7 @@ angular.module('dfSwaggerUI', ['ngRoute', 'dfUtility'])
                 }
             }
         };
-    }])
+    }]);
 
 
 

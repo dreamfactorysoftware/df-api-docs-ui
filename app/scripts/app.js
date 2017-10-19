@@ -31,17 +31,12 @@ angular
     .config(['$httpProvider', 'APP_API_KEY', function($httpProvider, APP_API_KEY) {
 
         $httpProvider.defaults.headers.common['X-Dreamfactory-API-Key'] = APP_API_KEY;
-        $httpProvider.interceptors.push('httpValidSession');
     }])
 
     // Configure main app routing rules
-    .config(['$routeProvider', function ($routeProvider) {
+    .config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
         $routeProvider
-            .when('/logout', {
-                controller: 'LogoutCtrl',
-                templateUrl: 'views/logout.html'
-            })
-            .otherwise({
+            .when('/login', {
                 controller: 'LoginCtrl',
                 templateUrl: 'views/login.html',
                 resolve: {
@@ -53,7 +48,7 @@ angular
 
                         // we're trying to go to login
                         // if we have a valid session then no need to go to login
-                        if (currentUser && currentUser.session_id) {
+                        if (currentUser && currentUser.session_token) {
                             $location.url('/services');
                             deferred.reject();
                         } else {
@@ -62,104 +57,34 @@ angular
                         return deferred.promise;
                     }]
                 }
-            });
-    }])
+            })
+            .when('/logout', {
+                controller: 'LogoutCtrl',
+                templateUrl: 'views/logout.html'
+            })
+            .otherwise({
+                controller: 'LoginCtrl',
+                templateUrl: 'views/login.html',
+                resolve: {
 
-    // Intercepts outgoing http calls.  Checks for valid session.  If 401 will trigger a pop up login screen.
-    .factory('httpValidSession', ['$q', '$rootScope', '$location', 'INSTANCE_URL', '$injector', function ($q, $rootScope, $location, INSTANCE_URL, $injector) {
+                    checkOtherRoute: ['$q', 'UserDataService', '$location', function ($q, UserDataService, $location) {
 
-        var refreshSession = function (reject) {
+                        var deferred = $q.defer();
+                        var currentUser = UserDataService.getCurrentUser();
 
-            var $http = $injector.get('$http');
-            var UserDataService = $injector.get('UserDataService');
-            var user = UserDataService.getCurrentUser();
-            var deferred = $injector.get('$q').defer();
-
-            var url = user.is_sys_admin ? '/api/v2/system/admin/session' : '/api/v2/user/session';
-
-            $http({
-                method: 'PUT',
-                url: INSTANCE_URL + url
-            }).then(function (result) {
-                UserDataService.setCurrentUser(result.data);
-                retry(reject.config, deferred);
-            }, function () {
-                newSession(reject, deferred);
-            });
-
-            return deferred.promise;
-        };
-
-        var retry = function (config, deferred) {
-
-            var request = {
-                method: config.method,
-                url: config.url
-            };
-            if (config.params) {
-                request.params = config.params;
-            }
-            if (config.data) {
-                request.data = config.data;
-            }
-            if (config.transformRequest) {
-                request.transformRequest = config.transformRequest;
-            }
-            var $http = $injector.get('$http');
-            $http(request).then(deferred.resolve, deferred.reject);
-            return deferred.promise;
-        };
-
-        var newSession = function (reject, deferred) {
-
-            var UserDataService = $injector.get('UserDataService');
-            UserDataService.unsetCurrentUser();
-
-            deferred = deferred || $injector.get('$q').defer();
-
-            $rootScope.$$childHead.openLoginWindow(reject);
-            $rootScope.$on('user:login:success', function () {
-                retry(reject.config, deferred);
-            });
-
-            return deferred.promise;
-        };
-
-        return {
-
-            request: function (config) {
-
-                return config;
-            },
-
-            requestError: function (reject) {
-
-                return $q.reject(reject);
-            },
-
-            response: function (response) {
-
-                return response;
-            },
-
-            responseError: function (reject) {
-
-                if (reject.config.url.indexOf('/session') === -1) {
-                    if (reject.status === 400 || (reject.data && reject.data.error && reject.data.error.code === 400) ||
-                        reject.status === 401 || (reject.data && reject.data.error && reject.data.error.code === 401) ||
-                        ((reject.status === 403 || (reject.data && reject.data.error && reject.data.error.code === 403)) && reject.data.error.message.indexOf('The token has been blacklisted') >= 0)) {
-
-                        if (reject.data.error.message === 'Token has expired') {
-                            //  refresh session
-                            return refreshSession(reject);
+                        // if we are loading the base URL of index.html then the path will be ""
+                        // if we have a valid session then go to services list
+                        // if there is no session then go to login
+                        if (currentUser && currentUser.session_token) {
+                            $location.url('/services');
+                        } else {
+                            $location.url('/login');
                         }
-                        else {
-                            // new session
-                            return newSession(reject);
-                        }
-                    }
+                        deferred.reject();
+                        return deferred.promise;
+                    }]
                 }
-                return $q.reject(reject);
-            }
-        };
+            });
+
+        $httpProvider.interceptors.push('httpValidSession');
     }]);
