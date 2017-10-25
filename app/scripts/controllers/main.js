@@ -16,6 +16,11 @@ angular.module('dreamfactoryApidocsApp')
             $scope.title = 'DreamFactory API Docs';
 
             $scope.adminApp = dfApplicationData.getQueryParameter("admin_app");
+            if ($scope.adminApp) {
+                $scope.$parent.bodyStyle = {'padding-top':'0px'};
+            } else {
+                $scope.$parent.bodyStyle = {'padding-top':'50px'};
+            }
 
             $scope.currentUser = UserDataService.getCurrentUser();
 
