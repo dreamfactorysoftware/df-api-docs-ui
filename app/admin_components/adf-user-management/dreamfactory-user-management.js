@@ -1743,7 +1743,6 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
             // remove unnecessary data
             // this is temporary and cleans up our
             // session obj that is returned by the login function
-            console.log($cookies, $http);
             delete userDataObj.session_id;
 
             // Set the cookie
