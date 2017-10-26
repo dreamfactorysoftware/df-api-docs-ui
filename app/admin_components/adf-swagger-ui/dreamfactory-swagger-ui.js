@@ -50,7 +50,7 @@ angular.module('dfSwaggerUI', ['ngRoute', 'dfUtility'])
 
                 var url = INSTANCE_URL + "/api/v2/api_docs/" + scope.serviceName;
 
-                scope.server = INSTANCE_URL + '/df-api-docs-ui-local/bower_components/df-swagger-ui/dist/index.html';
+                scope.server = INSTANCE_URL + '/df-api-docs-ui/bower_components/df-swagger-ui/dist/index.html';
 
                 scope.server +=
                     "?api_key=" + encodeURIComponent(APP_API_KEY) +
