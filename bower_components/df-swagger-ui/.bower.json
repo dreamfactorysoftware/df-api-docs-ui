@@ -1,12 +1,12 @@
 {
   "name": "df-swagger-ui",
   "homepage": "https://github.com/dreamfactorysoftware/df-swagger-ui",
-  "version": "0.4.0",
-  "_release": "0.4.0",
+  "version": "0.4.1",
+  "_release": "0.4.1",
   "_resolution": {
     "type": "version",
-    "tag": "0.4.0",
-    "commit": "f110d3e1bb6a9c5234732fdb95cb970af42cc550"
+    "tag": "0.4.1",
+    "commit": "37beef7756a8db24f5e2866c2761c50b73676e26"
   },
   "_source": "https://github.com/dreamfactorysoftware/df-swagger-ui.git",
   "_target": "~0.4.0",
