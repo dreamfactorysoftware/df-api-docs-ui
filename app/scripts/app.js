@@ -34,7 +34,10 @@ angular
     }])
 
     // Configure main app routing rules
-    .config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
+    .config(['$routeProvider', '$httpProvider', '$locationProvider', function ($routeProvider, $httpProvider, $locationProvider) {
+
+        $locationProvider.hashPrefix('');
+
         $routeProvider
             .when('/login', {
                 controller: 'LoginCtrl',
