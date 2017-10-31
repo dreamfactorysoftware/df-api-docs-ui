@@ -10,8 +10,12 @@
 angular.module('dreamfactoryApidocsApp')
 
     // MainCtrl is the parent controller of everything.
-    .controller('MainCtrl', ['$scope', 'dfApplicationData', '$location', 'UserDataService', 'dfIconService',
-        function ($scope, dfApplicationData, $location, UserDataService, dfIconService) {
+    .controller('MainCtrl', ['$scope', 'dfApplicationData', '$location', 'UserDataService', 'dfIconService', '$animate',
+        function ($scope, dfApplicationData, $location, UserDataService, dfIconService, $animate) {
+
+            // workaround for issue that causes flickering when loading templates
+            // https://github.com/angular/angular.js/issues/14015
+            $animate.enabled(false);
 
             $scope.title = 'DreamFactory API Docs';
 

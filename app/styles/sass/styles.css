@@ -9112,6 +9112,11 @@ body {
   cursor: pointer;
 }
 
+/* line 176, partials/_base.scss */
+.fa-clipboard {
+  cursor: pointer;
+}
+
 /* line 2, partials/_df-top-level-nav-std.scss */
 .df-top-navbar {
   margin-bottom: 0;
@@ -9121,4 +9126,23 @@ body {
 .df-top-navbar .navbar-brand {
   padding-left: 15px;
   padding-top: 4px;
+}
+
+/* line 3, partials/_df-swagger-ui.scss */
+pre {
+  margin: 0 0 0 5px;
+  padding: 0px;
+  background-color: #7d8492;
+  border: 0px;
+  font-size: 10px;
+}
+
+/* line 12, partials/_df-swagger-ui.scss */
+h2 {
+  font-weight: bold;
+}
+
+/* line 17, partials/_df-swagger-ui.scss */
+h4 {
+  font-weight: bold;
 }

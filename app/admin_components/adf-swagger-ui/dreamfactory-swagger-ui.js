@@ -48,23 +48,39 @@ angular.module('dfSwaggerUI', ['ngRoute', 'dfUtility'])
             templateUrl: MOD_SWAGGER_UI_ASSET_PATH + 'views/swagger.html',
             link: function( scope, elem, attrs ) {
 
-                var url = INSTANCE_URL + "/api/v2/api_docs/" + scope.serviceName;
-
-                scope.server = INSTANCE_URL + '/df-api-docs-ui/bower_components/df-swagger-ui/dist/index.html';
-
-                scope.server +=
-                    "?api_key=" + encodeURIComponent(APP_API_KEY) +
-                    "&url=" + encodeURIComponent(url);
-
-                var user = UserDataService.getCurrentUser();
-
+                var sessionToken = "", user = UserDataService.getCurrentUser();
                 if (user && user.session_token) {
-                    scope.server +=
-                        "&session_token=" + encodeURIComponent(user.session_token);
+                    sessionToken = user.session_token;
                 }
+
+                // Build a system
+                var ui = SwaggerUIBundle({
+                    url: INSTANCE_URL + "/api/v2/api_docs/" + scope.serviceName,
+                    requestInterceptor: function(request) {
+                        var headers = request.headers || {};
+                        headers['X-DreamFactory-API-Key'] = APP_API_KEY;
+                        headers['X-DreamFactory-Session-Token'] = sessionToken;
+                        return request;
+                    },
+                    validatorUrl: null,
+                    dom_id: '#swagger-ui',
+                    tagsSorter: "alpha",
+                    operationsSorter: "alpha", // or "method"
+                    defaultModelRendering: "example", // or "model"
+                    docExpansion: "list",
+                    displayOperationId: false,
+                    displayRequestDuration: false,
+                    filter: true,
+                    deepLinking: true,
+                    presets: [
+                        SwaggerUIBundle.presets.apis,
+                        SwaggerUIStandalonePreset
+                    ],
+                    plugins: [
+                        SwaggerUIBundle.plugins.DownloadUrl
+                    ],
+                    layout: "StandaloneLayout"
+                });
             }
         };
     }]);
-
-
-
