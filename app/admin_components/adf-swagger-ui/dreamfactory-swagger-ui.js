@@ -70,7 +70,7 @@ angular.module('dfSwaggerUI', ['ngRoute', 'dfUtility'])
                     displayOperationId: false,
                     displayRequestDuration: false,
                     filter: true,
-                    deepLinking: true,
+                    deepLinking: false,
                     presets: [
                         SwaggerUIBundle.presets.apis,
                         SwaggerUIStandalonePreset
