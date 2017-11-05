@@ -18,7 +18,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
         }])
     */
 
-    .run(['$cookies', 'UserDataService', function ($cookies, UserDataService) {
+    .run(['$cookies', 'UserDataService', 'SystemConfigDataService', function ($cookies, UserDataService, SystemConfigDataService) {
 
         var readCookie = function (name) {
 
@@ -29,27 +29,37 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                 match = null;
 
             if (window.opener) {
+                // check for opened from launchpad or apps tab
                 match = window.opener.document.cookie.match(regex);
             }
 
             if (match === null) {
+                // check for opened from apidocs tab
                 match = window.parent.document.cookie.match(regex);
             }
 
             return match && unescape(match[1]);
         };
 
-        // inherit admin app cookie value
-        var userObj = readCookie('CurrentUserObj');
-        if (userObj) {
+        // try to inherit cookie value
+        var cookie = readCookie('CurrentUserObj');
+        if (cookie) {
             try {
-                userObj = JSON.parse(userObj);
-                UserDataService.setCurrentUser(userObj);
+                cookie = JSON.parse(cookie);
+                // set user and query the system config to verify session token is still good
+                // the cache in dfApplicationData is empty at this point
+                // if the session token is good then the config is cached in dfApplicationData for future use
+                // calling setCurrentUser inside this run block does not trigger the watcher on currentUser
+                UserDataService.setCurrentUser(cookie);
+                var config = SystemConfigDataService.getSystemConfig();
+                if (!config) {
+                    // session token is bad, clear out user and let routing code in app.js trigger login
+                    UserDataService.unsetCurrentUser();
+                }
             } catch(e) {
+                // bad cookie
                 UserDataService.unsetCurrentUser();
             }
-        } else {
-            UserDataService.unsetCurrentUser();
         }
     }])
 
@@ -1720,7 +1730,6 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
         // Stored user.
         var currentUser = false;
 
-
         // Private methods
         // return current user
         function _getCurrentUser() {
@@ -1734,10 +1743,6 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
             // remove unnecessary data
             // this is temporary and cleans up our
             // session obj that is returned by the login function
-            // If a user has a large number of apps it can overflow our cookie
-            // So we're not going to store this info
-            delete userDataObj.no_group_apps;
-            delete userDataObj.app_groups;
             delete userDataObj.session_id;
 
             // Set the cookie
@@ -1761,12 +1766,6 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
             currentUser = false;
         }
 
-        // check if we have a user
-        function _hasUser() {
-
-            return !!currentUser;
-        }
-
         return {
 
             // Public methods
@@ -1785,11 +1784,6 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
             unsetCurrentUser: function () {
 
                 _unsetCurrentUser();
-            },
-
-            hasUser: function () {
-
-                return _hasUser();
             }
         }
     }])
@@ -1830,7 +1824,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
         }
 
     }])
-    .service('dfXHRHelper', ['INSTANCE_URL', 'ADMIN_API_KEY', 'UserDataService', function (INSTANCE_URL, ADMIN_API_KEY, UserDataService) {
+    .service('dfXHRHelper', ['INSTANCE_URL', 'APP_API_KEY', 'UserDataService', function (INSTANCE_URL, APP_API_KEY, UserDataService) {
 
         function _isEmpty(obj) {
 
@@ -1856,8 +1850,11 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
         function _setHeaders(_xhrObj, _headersDataObj) {
 
             // Setting Dreamfactory Headers
-            _xhrObj.setRequestHeader("X-DreamFactory-API-Key", ADMIN_API_KEY);
-            _xhrObj.setRequestHeader("X-DreamFactory-Session-Token", UserDataService.getCurrentUser.session_token);
+            _xhrObj.setRequestHeader("X-DreamFactory-API-Key", APP_API_KEY);
+            var currentUser = UserDataService.getCurrentUser();
+            if (currentUser && currentUser.session_tpken) {
+                xhrObj.setRequestHeader("X-DreamFactory-Session-Token", currentUser.session_token);
+            }
 
             // Set additional headers
             for (var _key in _headersDataObj) {

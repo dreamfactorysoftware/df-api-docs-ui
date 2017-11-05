@@ -10,12 +10,21 @@
 angular.module('dreamfactoryApidocsApp')
 
     // MainCtrl is the parent controller of everything.
-    .controller('MainCtrl', ['$scope', 'dfApiDataService', '$location', 'UserDataService', 'dfIconService',
-        function ($scope, dfApiDataService, $location, UserDataService, dfIconService) {
+    .controller('MainCtrl', ['$scope', 'dfApplicationData', '$location', 'UserDataService', 'dfIconService', '$animate',
+        function ($scope, dfApplicationData, $location, UserDataService, dfIconService, $animate) {
+
+            // workaround for issue that causes flickering when loading templates
+            // https://github.com/angular/angular.js/issues/14015
+            $animate.enabled(false);
 
             $scope.title = 'DreamFactory API Docs';
 
-            $scope.adminApp = dfApiDataService.getQueryParameter("admin_app");
+            $scope.adminApp = dfApplicationData.getQueryParameter("admin_app");
+            if ($scope.adminApp) {
+                $scope.$parent.bodyStyle = {'padding-top':'0px'};
+            } else {
+                $scope.$parent.bodyStyle = {'padding-top':'50px'};
+            }
 
             $scope.currentUser = UserDataService.getCurrentUser();
 
@@ -93,12 +102,15 @@ angular.module('dreamfactoryApidocsApp')
 
                 var links = [];
 
+                if (!angular.equals(newValue, oldValue)) {
+                    // user changed, reset application object to force reload of all data
+                    dfApplicationData.resetApplicationObj();
+                }
+
                 if (!newValue) {
                     links.push("login");
-                    $location.url('/login');
                 } else {
                     links.push("user");
-                    $location.url("/services");
                     $scope.setTopLevelLinkValue('user', 'label', newValue.name);
                 }
                 $scope._setActiveLinks($scope.topLevelLinks, links);
@@ -195,4 +207,4 @@ angular.module('dreamfactoryApidocsApp')
             // redirect
             $location.url('/login');
         });
-    }])
+    }]);

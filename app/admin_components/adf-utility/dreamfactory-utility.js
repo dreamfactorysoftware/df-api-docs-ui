@@ -17,7 +17,7 @@ angular.module('dfUtility', [])
             },
             template: '<div class="df-section-header df-section-all-round"><h4>{{title}}</h4></div>',
             link: function (scope, elem, attrs) {}
-        }
+        };
     }])
 
     // section tool bar for views
@@ -30,7 +30,7 @@ angular.module('dfUtility', [])
             transclude: true,
             templateUrl : MOD_UTILITY_ASSET_PATH + 'views/df-toolbar.html',
             link: function (scope, elem, attrs) {}
-        }
+        };
     }])
 
     // Need to fix this directive.  Kind of does what we want currently though
@@ -84,7 +84,7 @@ angular.module('dfUtility', [])
                     }
                 );
             }
-        }
+        };
     }])
 
     // Another shot a resize.  I think the was ripped off of the internet
@@ -122,7 +122,7 @@ angular.module('dfUtility', [])
             /* w.bind('resize', function () {
              scope.$apply();
              });*/
-        }
+        };
     }])
 
     // Used for setting the section heights
@@ -147,12 +147,12 @@ angular.module('dfUtility', [])
                     if (winWidth >= 992) {
                         $(elem).css({
                             height:  winHeight - 120
-                        })
+                        });
                     }
                     else {
                         $(elem).css({
                             height: 'auto'
-                        })
+                        });
                     }
                 }
             };
@@ -178,8 +178,8 @@ angular.module('dfUtility', [])
             $(window).on('resize', function () {
 
                 setSize();
-            })
-        }
+            });
+        };
     }])
 
     // Various Filters.  All used in dfTable.  Possibly elsewhere.
@@ -208,7 +208,7 @@ angular.module('dfUtility', [])
                 filtered.reverse();
             }
             return filtered;
-        }
+        };
     }
     ])
 
@@ -246,7 +246,7 @@ angular.module('dfUtility', [])
                 filtered.reverse();
             }
             return filtered;
-        }
+        };
     }
     ])
 
@@ -346,8 +346,8 @@ angular.module('dfUtility', [])
                             a = a === null || a === undefined ? '' : a;
                             b = b === null || b === undefined ? '' : b;
 
-                            var upA = a
-                            var upB = b
+                            var upA = a;
+                            var upB = b;
                             return (
                                 upA < upB
                             ) ? -1 : (
@@ -365,59 +365,6 @@ angular.module('dfUtility', [])
     }
     ])
 
-    .service('dfApiDataService', ['$q', '$http', 'INSTANCE_URL', function ($q, $http, INSTANCE_URL) {
-
-        function loadOne(api) {
-
-            var deferred = $q.defer();
-
-            var url = INSTANCE_URL + "/api/v2/" + api.path;
-
-            $http.get(url).then(
-                function (result) {
-                    deferred.resolve(result.data);
-                },
-                function (error) {
-                    deferred.reject(error.data);
-                }
-            );
-
-            return deferred.promise;
-        }
-
-        return {
-
-            getApiData: function (apis) {
-                var deferred = $q.defer();
-
-                var promises = apis.map(function (api) {
-                    return loadOne(api);
-                });
-
-                $q.all(promises).then(
-                    function (response) {
-                        deferred.resolve(response);
-                    },
-                    function (response) {
-                        deferred.reject(response);
-                    }
-                );
-
-                return deferred.promise;
-            },
-
-            getQueryParameter: function (key) {
-                key = key.replace(/[*+?^$.\[\]{}()|\\\/]/g, "\\$&");
-                var match = window.location.search.match(new RegExp("[?&]" + key + "=([^&]+)(&|$)"));
-                var result = match && decodeURIComponent(match[1].replace(/\+/g, " "));
-                if (result) {
-                    return result;
-                }
-                return '';
-            }
-        }
-    }])
-
     .directive('dfEmptySearchResult', ['MOD_UTILITY_ASSET_PATH', '$location', function (MOD_UTILITY_ASSET_PATH, $location) {
         return {
             restrict: 'E',
@@ -428,7 +375,7 @@ angular.module('dfUtility', [])
                     scope.$parent.filterText = ($location.search() && $location.search().filter) ? $location.search().filter : null;
                 }
             }
-        }
+        };
     }])
 
     // Notification service
@@ -451,10 +398,11 @@ angular.module('dfUtility', [])
                     text:  messageOptions.message,
                     addclass: "stack_topleft",
                     animation: 'fade',
-                    animate_speed: 150,
-                    position_animate_speed: 150,
+                    animate_speed: 'normal',
+                    hide: true,
+                    delay: 3000,
                     stack: stack_topleft,
-                    mouse_reset: false
+                    mouse_reset: true
                 })
             })();
         }
@@ -484,7 +432,7 @@ angular.module('dfUtility', [])
                     error = errorDataObj.data.error;
                     if (error) {
                         // default to top level error
-                        message = error.message
+                        message = error.message;
                         if (message) {
                             result = message;
                         }
@@ -605,6 +553,76 @@ angular.module('dfUtility', [])
         };
     }])
 
+    // Helps merge objects.  Supports deep merge.  Many modules
+    // need this
+    .service('dfObjectService', [
+        function () {
+
+            return {
+
+                mergeDiff: function (obj1, obj2) {
+
+                    for (var key in obj1) {
+                        if (!obj2.hasOwnProperty(key) && key.substr(0,1) !== '$') {
+
+                            obj2[key] = obj1[key];
+                        }
+                    }
+
+                    return obj2;
+                },
+
+                mergeObjects: function (obj1, obj2) {
+
+                    for (var key in obj1) {
+                        obj2[key] = obj1[key];
+                    }
+
+                    return obj2;
+                },
+
+                deepMergeObjects: function (obj1, obj2) {
+
+                    var self = this;
+
+                    for (var _key in obj1) {
+                        if (obj2.hasOwnProperty(_key)) {
+
+                            switch (Object.prototype.toString.call(obj2[_key])) {
+
+                                case '[object Object]':
+                                    obj2[_key] = self.deepMergeObjects(obj1[_key], obj2[_key]);
+                                    break;
+
+                                case '[object Array]':
+                                    obj2[_key] = obj1[_key];
+                                    //obj2[_key].concat(obj1[_key]);
+                                    break;
+
+                                default:
+                                    obj2[_key] = obj1[_key];
+                            }
+
+                            /*    if(Object.prototype.toString.call(obj2[_key]) === '[object Object]') {
+
+                             obj2[_key] = self.deepMergeObjects(obj1[_key], obj2[_key]);
+                             }else {
+                             obj2[_key] = obj1[_key];
+                             }*/
+                        }
+                    }
+
+                    return obj2;
+                },
+
+                compareObjectsAsJson: function(o, p) {
+
+                    return angular.toJson(o) === angular.toJson(p);
+                }
+            };
+        }
+    ])
+
     // Icon Service
     .service('dfIconService', [function () {
 
@@ -615,4 +633,4 @@ angular.module('dfUtility', [])
                 user: 'fa fa-fw fa-user'
             };
         };
-    }])
+    }]);

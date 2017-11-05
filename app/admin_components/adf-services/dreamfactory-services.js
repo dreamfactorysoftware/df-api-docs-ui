@@ -18,9 +18,9 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
 
     }])
 
-    .controller('ServicesCtrl', ['$rootScope', '$scope', '$location', 'dfApiDataService', 'UserDataService', 'dfNotify', function ($rootScope, $scope, $location, dfApiDataService, UserDataService, dfNotify) {
+    .controller('ServicesCtrl', ['$rootScope', '$scope', '$location', 'dfApplicationData', 'UserDataService', 'dfNotify', function ($rootScope, $scope, $location, dfApplicationData, UserDataService, dfNotify) {
 
-        $scope.adminApp = dfApiDataService.getQueryParameter("admin_app");
+        $scope.adminApp = dfApplicationData.getQueryParameter("admin_app");
         $scope.apiData = null;
         $scope.services = null;
         $scope.filteredServices = null;
@@ -81,14 +81,9 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
 
             $scope.dataLoading = true;
 
-            var apis = [
+            var apis = ["/api/v2/api_docs"];
 
-                {
-                    "path": "api_docs"
-                }
-            ];
-
-            dfApiDataService.getApiData(apis).then(
+            dfApplicationData.getApiData(apis).then(
                 function (response) {
                     $scope.saveAsFile(response[0], "all_api_docs.json");
                 },
@@ -110,14 +105,9 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
 
             $scope.dataLoading = true;
 
-            var apis = [
+            var apis = ["/api/v2/api_docs/" + $scope.currentEditService.name];
 
-                {
-                    "path": "api_docs/" + $scope.currentEditService.name
-                }
-            ];
-
-            dfApiDataService.getApiData(apis).then(
+            dfApplicationData.getApiData(apis).then(
                 function (response) {
                     $scope.saveAsFile(response[0], $scope.currentEditService.name + "_api_docs.json");
                 },
@@ -139,19 +129,13 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
 
         $scope.loadTabData = function() {
 
-            var apis = [
+            var apis = ["/api/v2"];
 
-                {
-                    "name": "service_info",
-                    "path": ""
-                }
-            ];
-
-            dfApiDataService.getApiData(apis).then(
+            dfApplicationData.getApiData(apis).then(
                 function (response) {
                     var newApiData = {};
                     apis.forEach(function(value, index) {
-                        newApiData[value.name] = response[index].resource ? response[index].resource : response[index];
+                        newApiData[value] = response[index].resource ? response[index].resource : response[index];
                     });
                     $scope.apiData = newApiData;
 
@@ -171,7 +155,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
         }();
     }])
 
-    .directive('dfManageServices', ['$rootScope', 'MOD_SERVICES_ASSET_PATH', 'dfApiDataService', 'dfNotify', function ($rootScope, MOD_SERVICES_ASSET_PATH, dfApiDataService, dfNotify) {
+    .directive('dfManageServices', ['$rootScope', 'MOD_SERVICES_ASSET_PATH', 'dfApplicationData', 'dfNotify', function ($rootScope, MOD_SERVICES_ASSET_PATH, dfApplicationData, dfNotify) {
 
         return {
             restrict: 'E',
@@ -230,14 +214,9 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
 
                     // make sure we have a valid session before passing control to swagger
                     // also checks for services with no paths defined in service definition
-                    var apis = [
+                    var apis = ["/api/v2/api_docs/" + service.name];
 
-                        {
-                            "path": "api_docs/" + service.name
-                        }
-                    ];
-
-                    dfApiDataService.getApiData(apis).then(
+                    dfApplicationData.getApiData(apis).then(
                         function (response) {
                             if (Array.isArray(response) &&
                                 Array.isArray(response[0].paths) &&
@@ -287,7 +266,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
 
                         var services = [];
 
-                        angular.forEach(scope.apiData.service_info.services, function (service) {
+                        angular.forEach(scope.apiData['/api/v2'].services, function (service) {
                             if (service.name !== 'api_docs') {
                                 services.push(new ManagedService(service));
                             }
@@ -300,7 +279,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
 
                         var group, groups = {};
 
-                        angular.forEach(scope.apiData.service_info.service_types, function (service) {
+                        angular.forEach(scope.apiData['/api/v2'].service_types, function (service) {
                             group = service.group;
                             if (group !== 'API Doc' ) {
                                 if (!groups.hasOwnProperty(group)) {
@@ -368,7 +347,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
                     }
                 });
             }
-        }
+        };
     }])
 
     .directive('dfServiceDetails', ['MOD_SERVICES_ASSET_PATH', function (MOD_SERVICES_ASSET_PATH) {
@@ -385,7 +364,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
                     scope.$parent.currentEditService = null;
                 };
             }
-        }
+        };
     }])
 
     .directive('dfApiDocsLoading', [function() {

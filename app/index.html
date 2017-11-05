@@ -13,20 +13,21 @@
       <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 
       <!-- build:css({.tmp,app}) styles/styles.css -->
-      <link rel="stylesheet" href="styles/stylesheets/styles.css" />
-      <link rel="stylesheet" href="../bower_components/pnotify/pnotify.core.css" />
-      <link rel="stylesheet" href="../bower_components/pnotify/pnotify.buttons.css" />
+      <link rel="stylesheet" href="styles/sass/styles.css" />
+      <link rel="stylesheet" href="../bower_components/pnotify/dist/pnotify.css" />
+      <link rel="stylesheet" href="../bower_components/pnotify/dist/pnotify.buttons.css" />
+      <link rel="stylesheet" type="text/css" href="../bower_components/df-swagger-ui/dist/swagger-ui.css" >
+      <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600|Titillium+Web:400,600,700" rel="stylesheet">
       <!-- endbuild -->
-
   </head>
-  <body ng-app="dreamfactoryApidocsApp">
+  <body ng-app="dreamfactoryApidocsApp" ng-style="bodyStyle">
 
-    <!--[if lt IE 7]>
+  <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
     <!-- Add your site or application content here -->
-    <div id="dreamfactoryApidocsApp" data-ng-controller="MainCtrl" df-popup-login ng-style="{'padding-top': adminApp ? '0px' : '50px'}">
+    <div id="dreamfactoryApidocsApp" data-ng-controller="MainCtrl" df-popup-login>
 
         <div id="popup-login-container"></div>
 
@@ -56,27 +57,32 @@
     <!-- build:js(.) scripts/vendor.js -->
         <!-- bower:js -->
         <script src="bower_components/jquery/dist/jquery.js"></script>
-        <script src="bower_components/es5-shim/es5-shim.js"></script>
         <script src="bower_components/angular/angular.js"></script>
         <script src="bower_components/json3/lib/json3.js"></script>
-        <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="bower_components/es5-shim/es5-shim.js"></script>
+        <script src="bower_components/bootstrap-sass/assets/javascripts/bootstrap.js"></script>
         <script src="bower_components/angular-resource/angular-resource.js"></script>
         <script src="bower_components/angular-cookies/angular-cookies.js"></script>
         <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
         <script src="bower_components/angular-animate/angular-animate.js"></script>
         <script src="bower_components/angular-touch/angular-touch.js"></script>
         <script src="bower_components/angular-route/angular-route.js"></script>
-        <script src="bower_components/pnotify/pnotify.core.js"></script>
-        <script src="bower_components/pnotify/pnotify.buttons.js"></script>
-        <script src="bower_components/pnotify/pnotify.callbacks.js"></script>
-        <script src="bower_components/pnotify/pnotify.confirm.js"></script>
-        <script src="bower_components/pnotify/pnotify.desktop.js"></script>
-        <script src="bower_components/pnotify/pnotify.history.js"></script>
-        <script src="bower_components/pnotify/pnotify.nonblock.js"></script>
+        <script src="bower_components/df-swagger-ui/dist/swagger-ui-bundle.js"></script>
+        <script src="bower_components/df-swagger-ui/dist/swagger-ui-standalone-preset.js"></script>
+        <script src="bower_components/pnotify/dist/pnotify.js"></script>
+        <script src="bower_components/pnotify/dist/pnotify.animate.js"></script>
+        <script src="bower_components/pnotify/dist/pnotify.buttons.js"></script>
+        <script src="bower_components/pnotify/dist/pnotify.callbacks.js"></script>
+        <script src="bower_components/pnotify/dist/pnotify.confirm.js"></script>
+        <script src="bower_components/pnotify/dist/pnotify.desktop.js"></script>
+        <script src="bower_components/pnotify/dist/pnotify.history.js"></script>
+        <script src="bower_components/pnotify/dist/pnotify.mobile.js"></script>
+        <script src="bower_components/pnotify/dist/pnotify.nonblock.js"></script>
         <!-- endbower -->
     <!-- endbuild -->
 
     <!-- build:js({.tmp,app}) scripts/app.js -->
+    <script src="admin_components/adf-application/dreamfactory-application.js"></script>
     <script src="admin_components/adf-utility/dreamfactory-utility.js"></script>
     <script src="admin_components/adf-table/dreamfactory-table.js"></script>
     <script src="admin_components/adf-services/dreamfactory-services.js"></script>
