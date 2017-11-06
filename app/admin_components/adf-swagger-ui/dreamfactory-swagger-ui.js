@@ -62,6 +62,7 @@ angular.module('dfSwaggerUI', ['ngRoute', 'dfUtility'])
                         headers['X-DreamFactory-Session-Token'] = sessionToken;
                         return request;
                     },
+                    validatorUrl: null,
                     dom_id: '#swagger-ui',
                     tagsSorter: "alpha",
                     operationsSorter: "alpha", // or "method"
@@ -69,7 +70,7 @@ angular.module('dfSwaggerUI', ['ngRoute', 'dfUtility'])
                     docExpansion: "list",
                     displayOperationId: false,
                     displayRequestDuration: false,
-                    filter: true,
+                    filter: false,
                     deepLinking: false,
                     presets: [
                         SwaggerUIBundle.presets.apis,
