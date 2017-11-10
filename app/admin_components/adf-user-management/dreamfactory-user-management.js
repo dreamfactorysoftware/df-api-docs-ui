@@ -1166,14 +1166,6 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                             // Handle error in module
                             scope.errorMsg = 'Password and confirm password do not match.';
                             return;
-
-//                            // Throw an error
-//                            throw {
-//                                module: 'DreamFactory User Management',
-//                                type: 'error',
-//                                provider: 'dreamfactory',
-//                                exception: 'Password and confirm password do not match.'
-//                            }
                         }
 
 
@@ -1230,14 +1222,6 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                                         }, msg);
                                     }
                                     scope.errorMsg = msg;
-
-                                    // Throw an error
-//                                    throw {
-//                                        module: 'DreamFactory User Management',
-//                                        type: 'error',
-//                                        provider: 'dreamfactory',
-//                                        exception: reject
-//                                    }
                                 });
                         };
 

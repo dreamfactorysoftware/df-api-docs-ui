@@ -90,4 +90,48 @@ angular
             });
 
         $httpProvider.interceptors.push('httpValidSession');
+    }])
+
+    // Configure Error handling
+    .config(['$provide', function($provide) {
+
+        $provide.decorator('$exceptionHandler', ['$delegate', '$injector', function($delegate, $injector) {
+
+            return function(exception) {
+
+                // Angular 1.6 requires exceptions thrown in promises to be caught.
+                // The api docs app itself should use dfNotify and not throw exceptions
+                // for rejected promises. In order to allow modules like user mgt
+                // and tables to continue to throw exceptions we add this check here.
+
+                if (typeof exception === 'string') {
+                    var prefix = "Possibly unhandled rejection: ";
+                    if (exception.indexOf(prefix) === 0) {
+                        exception = angular.fromJson(exception.slice(prefix.length));
+                    }
+                }
+
+                // Was this error thrown explicitly by a module
+
+                if (exception.provider && (exception.provider === 'dreamfactory')) {
+
+                    $injector.invoke(['dfNotify', function(dfNotify) {
+
+                        var messageOptions = {
+                            module: exception.module,
+                            type: exception.type,
+                            provider: exception.provider,
+                            message: exception.exception
+                        };
+
+                        dfNotify.error(messageOptions);
+                    }]);
+                }
+                else {
+
+                    // Continue on to normal error handling
+                    return $delegate(exception);
+                }
+            };
+        }]);
     }]);
