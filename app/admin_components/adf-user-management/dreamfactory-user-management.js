@@ -51,8 +51,8 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                 // if the session token is good then the config is cached in dfApplicationData for future use
                 // calling setCurrentUser inside this run block does not trigger the watcher on currentUser
                 UserDataService.setCurrentUser(cookie);
-                var config = SystemConfigDataService.getSystemConfig();
-                if (!config) {
+                var systemConfig = SystemConfigDataService.getSystemConfig();
+                if (!systemConfig) {
                     // session token is bad, clear out user and let routing code in app.js trigger login
                     UserDataService.unsetCurrentUser();
                 }
@@ -81,7 +81,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                 link: function (scope, elem, attrs) {
 
                 }
-            }
+            };
         }])
 
     // Directive for Login.  This is does our login work and provides the attachment point for
@@ -141,7 +141,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                     scope.creds = {
                         email: '',
                         password: ''
-                    }
+                    };
 
                     scope.errorMsg = scope.inErrorMsg || '';
                     scope.successMsg = '';
@@ -150,19 +150,27 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
 
                     scope.loginForm = {};
 
+                    scope.adldap = [];
+                    scope.loginAttribute = 'email';
                     scope.systemConfig = SystemConfigDataService.getSystemConfig();
-                    scope.adldap = scope.systemConfig.authentication.adldap || [];
-                    scope.adldapAvailable = (scope.adldap.length>0)? true : false;
+                    if (scope.systemConfig && scope.systemConfig.authentication) {
+                        if (scope.systemConfig.authentication.hasOwnProperty('adldap')) {
+                            scope.adldap = scope.systemConfig.authentication.adldap;
+                        }
+                        if (scope.systemConfig.authentication.hasOwnProperty('login_attribute')) {
+                            scope.loginAttribute = scope.systemConfig.authentication.login_attribute;
+                        }
+                    }
+                    scope.adldapAvailable = (scope.adldap.length > 0);
                     scope.selectedService = null;
                     scope.rememberMe = false;
-                    var loginAttribute = scope.systemConfig.authentication.login_attribute;
 
-                    if(loginAttribute == "username"){
+                    if (scope.loginAttribute === "username") {
                         scope.userField = {
                             icon: 'fa-user',
                             text: 'Enter Username',
                             type: 'text'
-                        }
+                        };
                     } else {
                         scope.userField = {
                             icon: 'fa-envelope',
@@ -183,24 +191,24 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                                 icon: 'fa-user',
                                 text: 'Enter Username',
                                 type: 'text'
-                            }
+                            };
 
                             scope.creds = {
                                 username: '',
                                 password: '',
                                 service: service
-                            }
-                        } else if (loginAttribute == "username") {
+                            };
+                        } else if (scope.loginAttribute === "username") {
                             scope.userField = {
                                 icon: 'fa-user',
                                 text: 'Enter Username',
                                 type: 'text'
-                            }
+                            };
 
                             scope.creds = {
                                 username: '',
                                 password: ''
-                            }
+                            };
                         } else {
                             scope.userField = {
                                 icon: 'fa-envelope',
@@ -211,9 +219,9 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                             scope.creds = {
                                 email: '',
                                 password: ''
-                            }
+                            };
                         }
-                    }
+                    };
 
                     //////////////////////[Arif's changes for OAuth and Auto-Login using URL param]//////////////////////
                     scope.getQueryParameter = function (key) {
@@ -282,7 +290,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                             credsDataObj.username = $('#df-login-email').val();
                             credsDataObj.password = $('#df-login-password').val();
                             credsDataObj.service = scope.selectedService;
-                        } else if (loginAttribute == "username") {
+                        } else if (scope.loginAttribute === "username") {
                             credsDataObj.username = $('#df-login-email').val();
                             credsDataObj.password = $('#df-login-password').val();
                         } else if (credsDataObj.email === '' || credsDataObj.password === '') {
@@ -301,8 +309,8 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                     };
 
                     scope.forgotPassword = function () {
-                        // scope._toggleForms();
 
+                        // scope._toggleForms();
                         scope._forgotPassword();
                     };
 
@@ -319,11 +327,11 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                     // Public functions setting values directly
                     scope.dismissError = function () {
                         scope.errorMsg = '';
-                    }
+                    };
 
                     scope.dismissSuccess = function () {
                         scope.successMsg = '';
-                    }
+                    };
 
                     // PRIVATE API
                     // The private api section contains functions that do most of our heavy lifting
@@ -416,19 +424,17 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                                 // shutdown waiting directive
                                 scope.loginWaiting = false;
                             }
-                        )
+                        );
                     };
 
                     scope._toggleForms = function () {
 
                         scope._toggleFormsState();
-
                     };
 
                     scope._forgotPassword = function () {
 
                         scope.$broadcast(UserEventsService.password.passwordResetRequest, {email: scope.creds.email});
-
                     };
 
                     scope._skipLogin = function () {
@@ -460,9 +466,8 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                         // Call the complex implementation to handle the login request
                         scope._login(userDataObj);
                     });
-
                 }
-            }
+            };
         }])
 
     // Forgot Password Email Confirmation
@@ -476,22 +481,29 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
             templateUrl: MODUSRMNGR_ASSET_PATH + 'views/fp-email-conf.html',
             link: function (scope, elem, attrs) {
 
-
                 // CREATE SHORT NAMES
                 scope.es = UserEventsService.password;
-
 
                 scope.emailForm = true;
                 scope.emailError = false;
                 scope.securityQuestionForm = false;
                 scope.hidePasswordField = false;
+
+                scope.allowForeverSessions = false;
+                scope.loginAttribute = 'email';
                 scope.systemConfig = SystemConfigDataService.getSystemConfig();
-                scope.allowForeverSessions = scope.systemConfig.authentication.allow_forever_sessions;
-                var loginAttribute = scope.systemConfig.authentication.login_attribute;
+                if (scope.systemConfig && scope.systemConfig.authentication) {
+                    if (scope.systemConfig.authentication.hasOwnProperty('allow_forever_sessions')) {
+                        scope.allowForeverSessions = scope.systemConfig.authentication.allow_forever_sessions;
+                    }
+                    if (scope.systemConfig.authentication.hasOwnProperty('login_attribute')) {
+                        scope.loginAttribute = scope.systemConfig.authentication.login_attribute;
+                    }
+                }
 
                 scope.resetByEmail = true;
                 scope.resetByUsername = false;
-                if(loginAttribute == "username"){
+                if (scope.loginAttribute === "username") {
                     scope.resetByEmail = false;
                     scope.resetByUsername = true;
                 }
@@ -533,18 +545,17 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                 scope.securityQuestionSubmit = function (reset) {
 
                     if (!scope.identical) {
-                        scope.errorMsg = 'Passwords do not match.'
+                        scope.errorMsg = 'Passwords do not match.';
                         return;
                     }
 
                     if (!scope._verifyPasswordLength(reset)) {
-                        scope.errorMsg = 'Password must be at least 5 characters.'
+                        scope.errorMsg = 'Password must be at least 5 characters.';
                         return;
                     }
 
-
                     scope._securityQuestionSubmit(reset);
-                }
+                };
 
                 scope.verifyPassword = function (user) {
 
@@ -631,7 +642,6 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                                     // handle successful password reset
                                     function (result) {
 
-
                                         if (result.data.hasOwnProperty('security_question')) {
 
                                             scope.emailForm = false;
@@ -662,7 +672,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                                         // turn off waiting directive
                                         scope.requestWaiting = false;
                                     }
-                                )
+                                );
                             }
                             else {
                                 // Message received from server
@@ -676,7 +686,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                                 // turn off waiting directive
                                 scope.requestWaiting = false;
                             }
-                        )
+                        );
                 };
 
 
@@ -692,7 +702,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                                 email: reset.email,
                                 username: (reset.username)? reset.username : null,
                                 password: reset.new_password
-                            }
+                            };
 
                             scope.$emit(UserEventsService.password.passwordSetSuccess, userCredsObj)
 
@@ -706,7 +716,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                                         var userCredsObj = {
                                             email: reset.email,
                                             password: reset.new_password
-                                        }
+                                        };
 
                                         scope.$emit(UserEventsService.password.passwordSetSuccess, userCredsObj)
 
@@ -726,24 +736,21 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                             }
                         }
 
-                    ).finally(function() {})
-                }
+                    ).finally(function() {});
+                };
 
                 // WATCHERS AND INIT
 
 
                 // HANDLE MESSAGES
 
-
-
                 scope.$on(UserEventsService.password.passwordResetRequest, function (e, resetDataObj) {
-
 
                     scope._toggleForms();
                     // scope._requestPasswordReset(resetDataObj);
                 });
             }
-        }
+        };
     }])
 
     // Forgot Password Security Question
@@ -755,12 +762,8 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
             templateUrl: MODUSRMNGR_ASSET_PATH + 'views/fp-security-question.html',
             link: function (scope, elem, attrs) {
 
-
-
-
-
             }
-        }
+        };
     }])
 
     // Password Reset Directive
@@ -796,18 +799,23 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
 
                     scope.successMsg = '';
                     scope.errorMsg = '';
-                    var loginAttribute = SystemConfigDataService.getSystemConfig().authentication.login_attribute;
+
+                    scope.loginAttribute = 'email';
+                    scope.systemConfig = SystemConfigDataService.getSystemConfig();
+                    if (scope.systemConfig && scope.systemConfig.authentication && scope.systemConfig.authentication.hasOwnProperty('login_attribute')) {
+                        scope.loginAttribute = scope.systemConfig.authentication.login_attribute;
+                    }
 
                     scope.resetByEmail = true;
                     scope.resetByUsername = false;
-                    if(loginAttribute == "username"){
+                    if (scope.loginAttribute === "username") {
                         scope.resetByEmail = false;
                         scope.resetByUsername = true;
                     }
 
                     scope.resetWaiting = false;
 
-                    scope.user = {}
+                    scope.user = {};
 
                     var UrlParams = $location.search();
 
@@ -824,27 +832,26 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                     // Public functions setting values directly
                     scope.dismissError = function () {
                         scope.errorMsg = '';
-                    }
+                    };
 
                     scope.dismissSuccess = function () {
                         scope.successMsg = '';
-                    }
+                    };
 
                     // PUBLIC API
                     scope.resetPassword = function (credsDataObj) {
 
                         if (!scope.identical) {
-                            scope.errorMsg = 'Passwords do not match.'
+                            scope.errorMsg = 'Passwords do not match.';
                             return;
                         }
 
                         if (!scope._verifyPasswordLength(credsDataObj)) {
-                            scope.errorMsg = 'Password must be at least 5 characters.'
+                            scope.errorMsg = 'Password must be at least 5 characters.';
                             return;
                         }
 
-
-                        scope._resetPassword(credsDataObj)
+                        scope._resetPassword(credsDataObj);
                     };
 
                     scope.verifyPassword = function (user) {
@@ -903,13 +910,11 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                                     email: credsDataObj.email,
                                     username: (credsDataObj.username)? credsDataObj.username : null,
                                     password: credsDataObj.new_password
-                                }
+                                };
 
                                 scope.$emit(scope.es.passwordSetSuccess, userCredsObj);
 
                                 scope.showTemplate = false;
-
-
                             },
                             function (reject) {
                                 if(reject.status == '401' || reject.status == '404'){
@@ -919,13 +924,11 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                                             var userCredsObj = {
                                                 email: credsDataObj.email,
                                                 password: credsDataObj.new_password
-                                            }
+                                            };
 
                                             scope.$emit(scope.es.passwordSetSuccess, userCredsObj);
 
                                             scope.showTemplate = false;
-
-
                                         },
                                         function (reject) {
 
@@ -937,7 +940,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                                         function() {
                                             scope.resetWaiting = false;
                                         }
-                                    )
+                                    );
                                 } else {
                                     scope.errorMsg = reject.data.error.message;
                                     scope.$emit(scope.es.passwordSetError);
@@ -948,7 +951,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                                 function() {
                                     scope.resetWaiting = false;
                                 }
-                            )
+                            );
                     };
 
 
@@ -971,9 +974,9 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                     scope.$on('$destroy', function (e) {
 
                         watchInErrorMsg();
-                    })
+                    });
                 }
-            }
+            };
         }])
 
     // Logout Directive
@@ -1035,9 +1038,9 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                                         type: 'error',
                                         provider: 'dreamfactory',
                                         exception: reject
-                                    }
+                                    };
                                 }
-                            })
+                            });
                     };
 
                     // WATCHERS AND INIT ** See login directive for more info **
@@ -1057,7 +1060,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                     // run when we hit the route and subsequently log us out.
                     scope._logout();
                 }
-            }
+            };
         }])
 
     // Register Directive.  Takes care of registering a user for our application
@@ -1094,16 +1097,13 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
 
                     scope.errorMsg = '';
 
-                    scope.loginAttribute = SystemConfigDataService.getSystemConfig().authentication.login_attribute;
+                    scope.loginAttribute = 'email';
+                    scope.systemConfig = SystemConfigDataService.getSystemConfig();
+                    if (scope.systemConfig && scope.systemConfig.authentication && scope.systemConfig.authentication.hasOwnProperty('login_attribute')) {
+                        scope.loginAttribute = scope.systemConfig.authentication.login_attribute;
+                    }
 
-                    // scope.usernamePlaceholder = "Choose Username (Optional, defaults to email address)";
-                    // scope.emailPlaceholder = 'Enter Email (Required for login)';
-                    // if(loginAttribute == 'username'){
-                    //     scope.usernamePlaceholder = 'Choose Username (Required for login)';
-                    //     scope.emailPlaceholder = 'Enter Email';
-                    // }
-
-                    scope.user = {}
+                    scope.user = {};
 
                     var UrlParams = $location.search();
 
@@ -1118,7 +1118,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                     // Public functions setting values directly
                     scope.dismissError = function () {
                         scope.errorMsg = '';
-                    }
+                    };
 
 
                     // PUBLIC API ** See login directive for more info **
@@ -1269,9 +1269,9 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                                         type: 'error',
                                         provider: 'dreamfactory',
                                         exception: reject
-                                    }
+                                    };
                                 }
-                            )
+                            );
                         }
                         else {
 
@@ -1305,9 +1305,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                             });
 
                             scope.options.confirmationRequired = config.authentication.allow_open_registration && config.authentication.open_reg_email_service_id ? true : null;
-
                         }
-
                     });
 
                     // HANDLE MESSAGES ** See login directive for more info **
@@ -1317,10 +1315,8 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                         // register the user
                         scope._register(registerDataObj);
                     });
-
                 }
-            }
-
+            };
         }])
 
     // User Profile Directive
@@ -1338,11 +1334,10 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
 
                 scope.es = UserEventsService.profile;
 
-                var defaults = {showTemplate: true}
+                var defaults = {showTemplate: true};
                 scope.options = _dfObjectService.mergeObjects(scope.options, defaults);
-
             }
-        }
+        };
     }])
 
     // Remote Auth Providers Directive
@@ -1361,24 +1356,23 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                     // @TODO: Google Plus Provider name needs to be worked out on server so I don't have to change it on the client
                     // @TODO: Fix providers {{client_id}} stuff
 
-
+                    scope.oauths = [];
                     scope.systemConfig = SystemConfigDataService.getSystemConfig();
-
-
-                    scope.oauths = scope.systemConfig.authentication.oauth;
+                    if (scope.systemConfig && scope.systemConfig.authentication && scope.systemConfig.authentication.hasOwnProperty('oauth')) {
+                        scope.oauths = scope.systemConfig.authentication.oauth;
+                    }
 
                     scope.loginWithProvider = function (providerData) {
 
                         scope._loginWithProvider(providerData);
                     };
 
-
                     scope._loginWithProvider = function (providerData) {
                         window.top.location.href = '/api/v2/'+providerData;
                         //window.top.location.href = '/web/remoteLogin?pid=' + providerData.api_name + '&return_url=' + encodeURI(window.top.location);
-                    }
+                    };
                 }
-            }
+            };
     }])
 
     .directive('dreamfactorySamlAuthProviders', ['MODUSRMNGR_ASSET_PATH', '_dfObjectService', 'UserDataService', 'UserEventsService', 'SystemConfigDataService',
@@ -1391,13 +1385,18 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                 templateUrl: MODUSRMNGR_ASSET_PATH + 'views/saml-auth-providers.html',
                 scope: false,
                 link: function(scope, elem, attrs) {
+
+                    scope.samls = [];
                     scope.systemConfig = SystemConfigDataService.getSystemConfig();
-                    scope.samls = scope.systemConfig.authentication.saml;
+                    if (scope.systemConfig && scope.systemConfig.authentication && scope.systemConfig.authentication.hasOwnProperty('saml')) {
+                        scope.samls = scope.systemConfig.authentication.saml;
+                    }
+
                     scope.loginWithProvider = function (providerData) {
                         window.top.location.href = '/api/v2/' + providerData;
-                    }
+                    };
                 }
-            }
+            };
         }])
 
     // Enter confirmation code page
@@ -1433,17 +1432,21 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                     scope.successMsg = '';
                     scope.confirmWaiting = false;
                     scope.submitLabel = 'Confirm ' + scope.inviteType.charAt(0).toUpperCase() + scope.inviteType.slice(1);
-                    var systemConfig = SystemConfigDataService.getSystemConfig();
-                    var loginAttribute = systemConfig.authentication.login_attribute;
+
+                    scope.loginAttribute = 'email';
+                    scope.systemConfig = SystemConfigDataService.getSystemConfig();
+                    if (scope.systemConfig && scope.systemConfig.authentication && scope.systemConfig.authentication.hasOwnProperty('login_attribute')) {
+                        scope.loginAttribute = scope.systemConfig.authentication.login_attribute;
+                    }
 
                     scope.useEmail = true;
                     scope.useUsername = false;
-                    if(loginAttribute == "username"){
+                    if (scope.loginAttribute === "username") {
                         scope.useEmail = false;
                         scope.useUsername = true;
                     }
 
-                    scope.user = {}
+                    scope.user = {};
 
                     var UrlParams = $location.search();
 
@@ -1464,7 +1467,6 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                     };
 
 
-
                     // PUBLIC API
                     scope.confirm = function (userConfirmObj) {
 
@@ -1478,8 +1480,6 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                             return;
                         }
 
-
-
                         scope._confirm(userConfirmObj);
                     };
 
@@ -1487,7 +1487,6 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
 
                         scope._verifyPassword(user);
                     };
-
 
 
                     // PRIVATE API
@@ -1506,7 +1505,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                     // Send confim obj to the server for...you guessed it...confirmation
                     scope._confirmUserToServer = function (requestDataObj) {
 
-                        var api = (scope.inviteType === 'user') ? 'user/password' : 'system/admin/password'
+                        var api = (scope.inviteType === 'user') ? 'user/password' : 'system/admin/password';
 
                         return $http({
                             url: INSTANCE_URL + '/api/v2/' + api,
@@ -1533,9 +1532,9 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                                     email: requestDataObj.email,
                                     username: (requestDataObj.username)? requestDataObj.username : null,
                                     password: requestDataObj.new_password
-                                }
+                                };
 
-                                scope.$emit(UserEventsService.confirm.confirmationSuccess, userCreds)
+                                scope.$emit(UserEventsService.confirm.confirmationSuccess, userCreds);
                             },
                             function (reject) {
 
@@ -1545,7 +1544,6 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                                 // there was an error
                                 // stop the waiting directive
                                 scope.confirmWaiting = false;
-
                             }
                         ).finally(
 
@@ -1554,7 +1552,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                                     // Do nothing..  We will have asked to login
 
                                 }
-                            )
+                            );
                     };
 
 
@@ -1579,13 +1577,10 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                     });
 
 
-
                     // HELP
 
-
-
                 }
-            }
+            };
         }])
 
     // blockss entry forms while waiting for server
@@ -1610,7 +1605,6 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                     t = (el.position().top + parseInt(el.parent().css('padding-top'))) + 'px',
                     l = (el.position().left + parseInt(el.parent().css('padding-left'))) + 'px';
 
-
                function size() {
 
                    h = el.parent('.panel-body').outerHeight();
@@ -1634,7 +1628,6 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                    });
                }
 
-
                 scope._showWaiting = function() {
 
                     size();
@@ -1657,13 +1650,11 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                     }
                 });
 
-
                 $(window).on('resize load', function () {
                     size();
-                })
-
+                });
             }
-        }
+        };
     }])
 
     // This service gives us a way to pass namespaced events around our application
@@ -1703,7 +1694,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                 confirmationError: 'user:confirmation:error',
                 confirmationRequest: 'user:confirmation:request'
             }
-        }
+        };
     }])
 
     // This service gives us access to the current user.  While it's pretty sparse
@@ -1769,7 +1760,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
 
                 _unsetCurrentUser();
             }
-        }
+        };
     }])
     .service('_dfObjectService', [function () {
 
@@ -1803,10 +1794,8 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                 }
 
                 return obj2;
-
             }
-        }
-
+        };
     }])
     .service('dfXHRHelper', ['INSTANCE_URL', 'APP_API_KEY', 'UserDataService', function (INSTANCE_URL, APP_API_KEY, UserDataService) {
 
@@ -1886,7 +1875,6 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
 
         function _makeRequest(_method, _url, _async, _params, _headers, _mimeType) {
 
-
             var xhr;
 
             // Create XHR object
@@ -1899,7 +1887,6 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
 
             // set and encode params
             var params = _setParams(_params);
-
 
             // Do XHR
             xhr.open(_method, INSTANCE_URL + '/api/v2/' + _url + params, _async);
@@ -1925,7 +1912,6 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
             }
         }
 
-
         function _get(optionsDataObj) {
 
             // We need a valid URL
@@ -1938,7 +1924,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                     type: 'error',
                     provider: 'dreamfactory',
                     exception: 'XHRHelper Request Failure: No URL provided'
-                }
+                };
             }
 
             // Default xhr options
@@ -1951,7 +1937,6 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
                 mimeType: "application/json"
             };
 
-
             // Merge user xhr options object with default xhr options object
             for (var _key in defaults) {
 
@@ -1962,9 +1947,7 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
 
             // Make the request with the merged object
             return _makeRequest(defaults.method, defaults.url, defaults.async, defaults.params, defaults.headers, defaults.mimeType);
-
         }
-
 
         return {
 
@@ -1972,6 +1955,5 @@ angular.module('dfUserManagement', ['ngRoute', 'ngCookies', 'dfUtility'])
 
                 return _get(requestOptions);
             }
-        }
-
+        };
     }]);
