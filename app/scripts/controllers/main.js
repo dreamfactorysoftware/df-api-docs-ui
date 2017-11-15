@@ -31,7 +31,7 @@ angular.module('dreamfactoryApidocsApp')
             $scope.topLevelLinks = [
 
                 {
-                    path: '#!/login',
+                    path: '#/login',
                     target: null,
                     label: 'Login',
                     name: 'login',
@@ -47,7 +47,7 @@ angular.module('dreamfactoryApidocsApp')
                     show: false,
                     subLinks: [
                         {
-                            path: '#!/logout',
+                            path: '#/logout',
                             target: null,
                             label: 'Logout',
                             name: 'logout',
