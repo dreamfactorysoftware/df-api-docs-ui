@@ -47,7 +47,7 @@ angular.module('dfApplication', ['dfUtility', 'dfUserManagement', 'ngResource'])
                 deferred.resolve(dfApplicationObj.apis[api]);
             } else {
                 params = {};
-                options = {'url': INSTANCE_URL + api};
+                options = {'url': INSTANCE_URL.url + api};
                 dfSystemData.resource(options).get(params).$promise.then(
                     function (response) {
                         dfApplicationObj.apis[api] = response;
@@ -86,7 +86,7 @@ angular.module('dfApplication', ['dfUtility', 'dfUserManagement', 'ngResource'])
                     xhr = new ActiveXObject("Microsoft.XMLHTTP");
                 }
 
-                xhr.open("GET", INSTANCE_URL + '/api/v2/system/' + api, false);
+                xhr.open("GET", INSTANCE_URL.url + '/system/' + api, false);
                 xhr.setRequestHeader("X-DreamFactory-API-Key", "6498a8ad1beb9d84d63035c5d1120c007fad6de706734db9689f8996707e0f7d");
                 if (currentUser && currentUser.session_token) {
                     xhr.setRequestHeader("X-DreamFactory-Session-Token", currentUser.session_token);
@@ -192,7 +192,7 @@ angular.module('dfApplication', ['dfUtility', 'dfUserManagement', 'ngResource'])
                 };
 
                 options = dfObjectService.mergeObjects(options, defaults);
-                var url = options.url || INSTANCE_URL + '/api/v2/system/:api/:id';
+                var url = options.url || INSTANCE_URL.url + '/system/:api/:id';
                 var queryParams = options.queryParams || { api: '@api', id: '@id' };
 
 
@@ -234,11 +234,11 @@ angular.module('dfApplication', ['dfUtility', 'dfUserManagement', 'ngResource'])
             var user = UserDataService.getCurrentUser();
             var deferred = $injector.get('$q').defer();
 
-            var url = user.is_sys_admin ? '/api/v2/system/admin/session' : '/api/v2/user/session';
+            var url = user.is_sys_admin ? '/system/admin/session' : '/user/session';
 
             $http({
                 method: 'PUT',
-                url: INSTANCE_URL + url
+                url: INSTANCE_URL.url + url
             }).then(function (result) {
                 UserDataService.setCurrentUser(result.data);
                 retry(reject.config, deferred);

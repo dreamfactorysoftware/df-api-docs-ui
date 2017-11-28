@@ -55,7 +55,7 @@ angular.module('dfSwaggerUI', ['ngRoute', 'dfUtility'])
 
                 // Build a system
                 var ui = SwaggerUIBundle({
-                    url: INSTANCE_URL + "/api/v2/api_docs/" + scope.serviceName,
+                    url: INSTANCE_URL.url + "/api_docs/" + scope.serviceName,
                     requestInterceptor: function(request) {
                         var headers = request.headers || {};
                         headers['X-DreamFactory-API-Key'] = APP_API_KEY;

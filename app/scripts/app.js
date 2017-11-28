@@ -22,10 +22,17 @@ angular
     // Set application version number
     .constant('APP_VERSION', '1.1.1')
 
+    // Set global url for this application
+    .constant('INSTANCE_BASE_URL', '')
+
+    // Make prefix configurable
+    .constant('INSTANCE_API_PREFIX', '/api/v2')
+
+    // App should use this service when making calls to the API
+    .service('INSTANCE_URL', ['INSTANCE_BASE_URL', 'INSTANCE_API_PREFIX', function (INSTANCE_BASE_URL, INSTANCE_API_PREFIX) { this.url = INSTANCE_BASE_URL + INSTANCE_API_PREFIX;}])
+
     // Set API key for this application, also used by df-swagger-ui
     .constant('APP_API_KEY', '36fda24fe5588fa4285ac6c6c2fdfbdb6b6bc9834699774c9bf777f706d05a88')
-
-    .constant('INSTANCE_URL', '')
 
     // Set global header for calls made to DreamFactory instance
     .config(['$httpProvider', 'APP_API_KEY', function($httpProvider, APP_API_KEY) {
