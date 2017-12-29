@@ -81,7 +81,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
 
             $scope.dataLoading = true;
 
-            var apis = ["/api/v2/api_docs"];
+            var apis = ["/api_docs"];
 
             dfApplicationData.getApiData(apis).then(
                 function (response) {
@@ -105,7 +105,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
 
             $scope.dataLoading = true;
 
-            var apis = ["/api/v2/api_docs/" + $scope.currentEditService.name];
+            var apis = ["/api_docs/" + $scope.currentEditService.name];
 
             dfApplicationData.getApiData(apis).then(
                 function (response) {
@@ -129,7 +129,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
 
         $scope.loadTabData = function() {
 
-            var apis = ["/api/v2"];
+            var apis = [""];
 
             dfApplicationData.getApiData(apis).then(
                 function (response) {
@@ -214,7 +214,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
 
                     // make sure we have a valid session before passing control to swagger
                     // also checks for services with no paths defined in service definition
-                    var apis = ["/api/v2/api_docs/" + service.name];
+                    var apis = ["/api_docs/" + service.name];
 
                     dfApplicationData.getApiData(apis).then(
                         function (response) {
@@ -266,7 +266,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
 
                         var services = [];
 
-                        angular.forEach(scope.apiData['/api/v2'].services, function (service) {
+                        angular.forEach(scope.apiData[''].services, function (service) {
                             if (service.name !== 'api_docs') {
                                 services.push(new ManagedService(service));
                             }
@@ -279,7 +279,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
 
                         var group, groups = {};
 
-                        angular.forEach(scope.apiData['/api/v2'].service_types, function (service) {
+                        angular.forEach(scope.apiData[''].service_types, function (service) {
                             group = service.group;
                             if (group !== 'API Doc' ) {
                                 if (!groups.hasOwnProperty(group)) {

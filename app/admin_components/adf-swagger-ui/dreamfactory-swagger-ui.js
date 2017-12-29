@@ -2,7 +2,7 @@
  * This file is part of DreamFactory (tm)
  *
  * http://github.com/dreamfactorysoftware/dreamfactory
- * Copyright 2012-2014 DreamFactory Software, Inc. <support@dreamfactory.com>
+ * Copyright 2012-2017 DreamFactory Software, Inc. <dspsupport@dreamfactory.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ angular.module('dfSwaggerUI', ['ngRoute', 'dfUtility'])
 
                 // Build a system
                 var ui = SwaggerUIBundle({
-                    url: INSTANCE_URL + "/api/v2/api_docs/" + scope.serviceName,
+                    url: INSTANCE_URL.url + "/api_docs/" + scope.serviceName,
                     requestInterceptor: function(request) {
                         var headers = request.headers || {};
                         headers['X-DreamFactory-API-Key'] = APP_API_KEY;
