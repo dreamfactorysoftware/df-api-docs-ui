@@ -35,6 +35,8 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
             details = 'You are not logged in. The default role for the API Docs app will determine which active services you have access to.';
         } else if (!user.is_sys_admin) {
             details = 'You are logged in as a non-admin user. Your assigned role for the API Docs app will determine which active services you have access to.';
+        } else if (user.is_sys_admin && user.role_id) {
+            details = 'You are logged in as a restricted admin. Your assigned role for the API Docs app will g which active services you have access to.';
         } else {
             details = "You are logged in as an admin user which allows access to all active services.";
         }
