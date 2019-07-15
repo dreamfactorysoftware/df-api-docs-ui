@@ -45,6 +45,7 @@ angular.module('dfSwaggerUI', ['ngRoute', 'dfUtility'])
             scope: {
                 serviceName: "="
             },
+            transclude: true,
             templateUrl: MOD_SWAGGER_UI_ASSET_PATH + 'views/swagger.html',
             link: function( scope, elem, attrs ) {
 
@@ -54,6 +55,7 @@ angular.module('dfSwaggerUI', ['ngRoute', 'dfUtility'])
                 }
 
                 // Build a system
+
                 var ui = SwaggerUIBundle({
                     url: INSTANCE_URL.url + "/api_docs/" + scope.serviceName,
                     requestInterceptor: function(request) {
