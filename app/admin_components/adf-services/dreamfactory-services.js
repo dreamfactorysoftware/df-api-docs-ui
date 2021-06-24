@@ -260,6 +260,27 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
                     }
                 };
 
+                var goToSelectedApiDoc = function () {
+
+                    // We want to seperate out the service name, which can be done by pulling out anything
+                    // after the second hash.
+                    var url = top.window.location.hash,
+                    delimiter = '#',
+                    start = 2,
+                    selectedServiceName = url.split(delimiter).slice(start).toString();
+
+                    function isCurrentService(service) {
+                        return service.record.name === selectedServiceName;
+                    }
+                    // We then check the selectedServiceName matches to one of the services in the 
+                    // ApiDocs table. If it does, then we open that Api Doc.
+                    var selectedService = scope.filteredServices.find(isCurrentService);
+
+                    if (selectedService) {
+                        scope.editService(selectedService.record);
+                    }
+                };
+
                 scope.$watch('apiData',  function (newValue) {
 
                     if (newValue) {
@@ -304,6 +325,11 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
                                 });
                             });
                         });
+
+                        var regex = /#.+#.+/;
+                        if (regex.test(top.window.location.hash)) {
+                            goToSelectedApiDoc();
+                        }
                     }
                 });
 
@@ -349,44 +375,6 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
                     }
                 });
 
-                var goToSelectedApiDoc = function () {
-                    
-                    if (!scope.dataLoading) {
-                        // We want to seperate out the service name, which can be done by pulling out anything
-                        // after the second hash.
-                        var url = top.window.location.hash,
-                        delimiter = '#',
-                        start = 2,
-                        serviceNameAsArray = url.split(delimiter).slice(start),
-                        selectedServiceName = serviceNameAsArray.toString();
-                        
-                        function isCurrentService(service) {
-                            return service.record.name === selectedServiceName;
-                        }
-                        // We then check the selectedServiceName matches to one of the services in the 
-                        // ApiDocs table. If it does, then we open that Api Doc.
-                        var selectedService = scope.filteredServices.find(isCurrentService);
-                        
-                        if (selectedService) {
-                            scope.editService(selectedService.record);
-                        }
-                    } else {
-                        // Wait until all services have loaded in before going to that API Doc.
-                        setTimeout(goToSelectedApiDoc, 300);
-                    }
-                };
-                
-                var init = function () {
-                    // On pageload, check whether the browser url contains a #{serviceName}, which will occur
-                    // if coming from a link in the services dashboard. If it does, then we want to 
-                    // automatically load the selected API Doc    
-                    var regex = /#.+#.+/;
-                    if (regex.test(top.window.location.hash)) {
-                        goToSelectedApiDoc();
-                    }
-                };
-
-                init();
             }
         };
     }])
