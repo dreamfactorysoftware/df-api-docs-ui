@@ -260,6 +260,27 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
                     }
                 };
 
+                var goToSelectedApiDoc = function () {
+
+                    // We want to seperate out the service name, which can be done by pulling out anything
+                    // after the second hash.
+                    var url = top.window.location.hash,
+                    delimiter = '#',
+                    start = 2,
+                    selectedServiceName = url.split(delimiter).slice(start).toString();
+
+                    function isCurrentService(service) {
+                        return service.record.name === selectedServiceName;
+                    }
+                    // We then check the selectedServiceName matches to one of the services in the 
+                    // ApiDocs table. If it does, then we open that Api Doc.
+                    var selectedService = scope.filteredServices.find(isCurrentService);
+
+                    if (selectedService) {
+                        scope.editService(selectedService.record);
+                    }
+                };
+
                 scope.$watch('apiData',  function (newValue) {
 
                     if (newValue) {
@@ -304,6 +325,11 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
                                 });
                             });
                         });
+
+                        var regex = /#.+#.+/;
+                        if (regex.test(top.window.location.hash)) {
+                            goToSelectedApiDoc();
+                        }
                     }
                 });
 
@@ -348,6 +374,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
                         scope.applyFilter();
                     }
                 });
+
             }
         };
     }])
@@ -364,6 +391,7 @@ angular.module('dfServices', ['ngRoute', 'dfUtility'])
                 scope.closeService = function () {
 
                     scope.$parent.currentEditService = null;
+                    top.window.location.hash = '#/apidocs';
                 };
             }
         };
